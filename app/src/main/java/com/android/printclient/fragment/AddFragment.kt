@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.android.printclient.MainActivity
 import com.android.printclient.R
+import com.android.printclient.view.adapter.AddAdapter
+import java.util.*
 
 /**
  * Created by jianglei on 16/4/30.
@@ -29,4 +31,5 @@ class AddFragment : Fragment() {
 
         return view
     }
+
 }
