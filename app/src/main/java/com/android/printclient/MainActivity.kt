@@ -3,6 +3,7 @@ package com.android.printclient
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -15,6 +16,10 @@ class MainActivity : AppCompatActivity() {
         printer_RecyclerView.layoutManager = LinearLayoutManager(this@MainActivity)
         printer_RecyclerView.setEmptyView(empty_LinearLayout)
 
+        search_ActionButton.setOnClickListener{
+
+        }
     }
+
 }
 
