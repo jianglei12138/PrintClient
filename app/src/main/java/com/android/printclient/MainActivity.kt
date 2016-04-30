@@ -1,6 +1,7 @@
 package com.android.printclient
 
 import android.os.Bundle
+import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
@@ -20,13 +21,14 @@ class MainActivity : AppCompatActivity() {
         //add fragment
         supportFragmentManager
                 .beginTransaction()
-                .add(container_CoordinatorLayout.id, MainFragment(), "main-fragment")
+                .add(container_CoordinatorLayout.id, MainFragment())
                 .commit()
         search_ActionButton.setOnClickListener() {
             //switch fragment
             supportFragmentManager
                     .beginTransaction()
-                    .addToBackStack(null) //for back key
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack("add") //for back key
                     .replace(container_CoordinatorLayout.id, AddFragment())
                     .commit()
             //hide fab

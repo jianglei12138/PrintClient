@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 
-class RecyclerViewWrapper : RecyclerView {
+class MainRecyclerView : RecyclerView {
 
     constructor(context: Context) : super(context)
 
@@ -19,11 +19,11 @@ class RecyclerViewWrapper : RecyclerView {
         override fun onChanged() {
             val adapter = adapter;
             if (adapter != null && emptyView != null) {
-                this@RecyclerViewWrapper.visibility = View.GONE
+                this@MainRecyclerView.visibility = View.GONE
                 emptyView!!.visibility = View.VISIBLE
             } else {
                 emptyView!!.visibility = View.GONE
-                this@RecyclerViewWrapper.visibility = View.VISIBLE
+                this@MainRecyclerView.visibility = View.VISIBLE
             }
         }
     }

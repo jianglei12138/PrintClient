@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.android.printclient.MainActivity
 import com.android.printclient.R
 
 /**
@@ -13,6 +14,13 @@ import com.android.printclient.R
 class AddFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //inflater
-        return inflater?.inflate(R.layout.fragment_add,container,false)
+        var view = inflater?.inflate(R.layout.fragment_add, container, false)
+
+        if (activity is MainActivity) {
+            var act = activity
+            act.title = getString(R.string.add_printers)
+        }
+
+        return view
     }
 }
