@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">PrintClient</string>
+    <string name="app_name">打印</string>
+    <string name="empty_TextView">没有添加打印机</string>
 </resources>
