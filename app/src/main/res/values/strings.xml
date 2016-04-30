@@ -3,4 +3,7 @@
     <string name="empty_TextView">没有添加打印机</string>
     <string name="save_printers">现有打印机</string>
     <string name="add_printers">添加打印机</string>
+    <string name="local_printer">本地打印机</string>
+    <string name="network_printer">搜索到的打印机</string>
+    <string name="other_printer">其他网络打印机</string>
 </resources>
