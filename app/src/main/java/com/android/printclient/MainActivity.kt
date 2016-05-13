@@ -3,13 +3,20 @@ package com.android.printclient
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.android.printclient.fragment.AddFragment
 import com.android.printclient.fragment.MainFragment
+import com.android.printclient.objects.Printer
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    init {
+        System.loadLibrary("extension")
+    }
+
+    external fun getPrinters(): List<Printer>
 
     private var mainFragment: MainFragment = MainFragment()
     private var addFragment: AddFragment = AddFragment()
@@ -34,6 +41,8 @@ class MainActivity : AppCompatActivity() {
             //hide fab
             search_ActionButton.visibility = View.GONE
         }
+        var list = getPrinters();
+        Log.d("printclient",list.size.toString())
     }
 
     override fun onBackPressed() {
