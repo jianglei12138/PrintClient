@@ -30,7 +30,7 @@ class MainAdapter : BaseAdapter {
             holder.name = convertView!!.findViewById(R.id.name_textView) as TextView
             holder.instance = convertView.findViewById(R.id.instance_textView) as TextView
             holder.uri = convertView.findViewById(R.id.url_textView) as TextView
-            holder.default = convertView.findViewById(R.id.default_View)
+            holder.default = convertView.findViewById(R.id.default_textView)
             convertView.tag = holder
         }
 
@@ -39,6 +39,12 @@ class MainAdapter : BaseAdapter {
         holder.name!!.text = printer.name
         holder.instance!!.text = printer.instance
         holder.uri!!.text = printer.deviceuri
+
+        if (printer.isdefault) {
+            holder.default!!.visibility = View.VISIBLE
+        } else {
+            holder.default!!.visibility = View.GONE
+        }
         return convertView
     }
 

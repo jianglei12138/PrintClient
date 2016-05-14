@@ -6,5 +6,7 @@
     <color name="colorEmptyText">#9A9A9A</color>
     <color name="colortitle">#18897B</color>
     <color name="colortext">#222222</color>
+    <color name="colorPrinterTitle">#3A3A3A</color>
+    <color name="colorDefaultBackground">#4177F6</color>
 
 </resources>
