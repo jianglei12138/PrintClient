@@ -9,5 +9,5 @@ class Printer {
     var name: String = ""
     var instance: String = ""
     var isdefault: Boolean = false
-    var options: ArrayList<Entry> = ArrayList<Entry>()
+    var deviceuri: String = ""
 }

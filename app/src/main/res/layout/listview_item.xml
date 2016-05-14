@@ -30,4 +30,14 @@
         android:layout_alignBottom="@+id/name_textView"
         android:layout_toRightOf="@+id/name_textView"
         android:layout_toEndOf="@+id/name_textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Small Text"
+        android:id="@+id/default_View"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/instance_textView"
+        android:layout_toEndOf="@+id/instance_textView" />
 </RelativeLayout>

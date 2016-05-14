@@ -11,9 +11,9 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import com.android.printclient.MainActivity
 import com.android.printclient.R
-import com.android.printclient.objects.Entry
 import com.android.printclient.objects.Printer
 import com.android.printclient.view.MainRecyclerView
+import com.android.printclient.view.adapter.MainAdapter
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.util.*
 
@@ -39,28 +39,10 @@ class MainFragment : Fragment() {
         //printer_ListView.
 
         var printerListView: ListView = view!!.findViewById(R.id.printer_ListView) as ListView
-        var emptyView: View = view!!.findViewById(R.id.empty_LinearLayout)
-
-        var listItem: ArrayList<HashMap<String, String>> = ArrayList()
+        var emptyView: View = view.findViewById(R.id.empty_LinearLayout)
 
         var printers = getPrinters()
-        for (item in printers) {
-            var map: HashMap<String, String> = HashMap()
-            map.put("name", item.name)
-            map.put("instance", item.instance)
-            var options: List<Entry> = item.options
-            var entry = options.filter { it.name.equals("device-uri") }.get(0)
-            map.put("device-uri", entry.value)
-            listItem.add(map)
-        }
-
-        var adapter: SimpleAdapter = SimpleAdapter(
-                activity,
-                listItem,
-                R.layout.listview_item,
-                arrayOf("name", "instance", "device-uri"),
-                intArrayOf(R.id.name_textView, R.id.name_textView, R.id.instance_textView)
-        )
+        var adapter: MainAdapter = MainAdapter(printers,activity)
 
         printerListView.emptyView = emptyView;
         printerListView.adapter = adapter
