@@ -10,5 +10,6 @@
     <color name="colorDefaultBackground">#4177F6</color>
     <color name="colorKey">#686868</color>
     <color name="colorValue">#6B6B6B</color>
+    <color name="colorDivider">#E7E7E7</color>
 
 </resources>

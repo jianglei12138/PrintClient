@@ -3,11 +3,13 @@ package com.android.printclient.view
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Display
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.TextView
 import com.android.printclient.R
+import com.android.printclient.utility.Translate
 import java.util.*
 
 /**
@@ -18,15 +20,19 @@ class PrinterDialog : Dialog {
     val SCREEN_DIALOG_RATE: Float = 0.96.toFloat()
     var mcontext: Context? = null
     var attributes: Map<String, String>? = null
+    var title: String? = null
 
-    constructor(context: Context, attributes: Map<String, String>) : super(context) {
+    constructor(context: Context, attributes: Map<String, String>, title: String) : super(context) {
         this.mcontext = context
         this.attributes = attributes
+        this.title = title
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.dialog_printer)
+
+        val dictionary: HashMap<String, String> = Translate(context).dictionary
 
         val display: Display = window.windowManager.defaultDisplay
         val param = window.attributes
@@ -41,7 +47,7 @@ class PrinterDialog : Dialog {
 
         for (item in attributes!!) {
             var map: HashMap<String, String> = HashMap()
-            map.put("key", item.key)
+            map.put("key", dictionary[item.key]!!)
             map.put("value", item.value)
             data.add(map)
         }
@@ -54,5 +60,8 @@ class PrinterDialog : Dialog {
                 intArrayOf(R.id.key_textView, R.id.value_textView)
         )
         attributeListView.adapter = adapter
+
+        certainTextView.setOnClickListener({ view -> dismiss() })
+        titleTextView.text = title
     }
 }

@@ -44,8 +44,7 @@ class MainFragment : Fragment() {
             if (printers[position].instance.length > 0) {
                 instance = printers[position].instance
             }
-            Log.d("prepared",instance+"---->"+name);
-            var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name,instance))
+            var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name,instance),name)
             dialog.show()
         }
 

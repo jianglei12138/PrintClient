@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">打印</string>
+    <string name="empty_TextView">没有添加打印机</string>
+    <string name="save_printers">现有打印机</string>
+    <string name="add_printers">添加打印机</string>
+    <string name="local_printer">本地打印机</string>
+    <string name="network_printer">搜索到的打印机</string>
+    <string name="other_printer">其他网络打印机</string>
+    <string name="printer_info">打印机信息</string>
+    <string name="printer_is_shared">共享打印机</string>
+    <string name="printer_location">打印机位置</string>
+    <string name="printer_make_and_model">打印机制造商与型号</string>
+    <string name="device_uri">打印机URI</string>
+    <string name="printer_uri_supported">打印机支持的URI</string>
+    <string name="printer_is_accepting_jobs">可接受打印任务</string>
+    <string name="printer_commands">打印机命令</string>
+    <string name="printer_state">打印机状态</string>
+    <string name="printer_state_change_time">打印机工作时间</string>
+    <string name="printer_state_reasons">附加状态</string>
+    <string name="printer_type">打印机对象值</string>
+    <string name="job_priority">作业优先级</string>
+    <string name="job_sheets">作业页</string>
+    <string name="copies">复制</string>
+    <string name="finishings">附装</string>
+    <string name="job_cancel_after">取消作业延时</string>
+    <string name="job_hold_until">保持作业时间</string>
+    <string name="marker_change_time">标记更改时间</string>
+    <string name="number_up">列举</string>
+</resources>
