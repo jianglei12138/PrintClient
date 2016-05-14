@@ -67,3 +67,51 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_MainFragment_get
     }
     return client_printer_list_instance;
 }
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_MainFragment_getAttributePrinter(
+		JNIEnv *env, jobject jthis, jstring name, jstring instance) {
+
+	int i; /*for loop       */
+	cups_dest_t *dests; /*printers       */
+	cups_dest_t *dest; /*result printer */
+	int dest_num; /*printer nums   */
+	jclass map; /*return map     */
+	jmethodID init_map; /*constructor map*/
+
+	dest_num = cupsGetDests(&dests);
+	const char *dest_name = (*env)->GetStringUTFChars(env, name, 0);
+
+	char *dest_instance;
+	if (instance == NULL)
+		dest_instance = NULL;
+	else
+		dest_instance = (*env)->GetStringUTFChars(env, instance, 0);
+
+	dest = cupsGetDest(dest_name, dest_instance, dest_num, dests);
+	if (dest == NULL)
+		return NULL ;
+	cups_option_t *temp = dest->options;
+	int count = dest->num_options;
+
+	//map
+	map = (*env)->FindClass(env, "java/util/HashMap");
+	if (map == NULL)
+		return NULL ;
+	init_map = (*env)->GetMethodID(env, map, "<init>", "()V");
+	if (init_map == NULL)
+		return NULL ;
+	jobject client_map_instance = (*env)->NewObject(env, map, init_map, "");
+	jmethodID client_map_put = (*env)->GetMethodID(env, map, "put",
+			"(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+	for (i = 0; i < count; i++) {
+		jstring itemname = (*env)->NewStringUTF(env,
+				temp->name ? temp->name : "");
+		jstring itemvalue = (*env)->NewStringUTF(env,
+				temp->value ? temp->value : "");
+		(*env)->CallObjectMethod(env, client_map_instance, client_map_put,
+				itemname, itemvalue);
+		temp++;
+	}
+	return client_map_instance;
+}

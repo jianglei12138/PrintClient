@@ -2,19 +2,17 @@ package com.android.printclient.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.AdapterView
 import android.widget.ListView
-import android.widget.SimpleAdapter
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.objects.Printer
-import com.android.printclient.view.MainRecyclerView
+import com.android.printclient.view.PrinterDialog
 import com.android.printclient.view.adapter.MainAdapter
-import kotlinx.android.synthetic.main.fragment_main.*
 import java.util.*
 
 class MainFragment : Fragment() {
@@ -24,6 +22,7 @@ class MainFragment : Fragment() {
     }
 
     external fun getPrinters(): List<Printer>
+    external fun getAttributePrinter(name: String, instance: String?): HashMap<String, String>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //inflater view
@@ -32,17 +31,23 @@ class MainFragment : Fragment() {
 
         if (activity is MainActivity)
             activity.title = getString(R.string.save_printers)
-        //printer list
-        //        printerRecyclerView.setHasFixedSize(true)
-        //        printerRecyclerView.layoutManager = LinearLayoutManager(activity)
-        //        printerRecyclerView.setEmptyView(emptyLinearLayout)
-        //printer_ListView.
 
         var printerListView: ListView = view!!.findViewById(R.id.printer_ListView) as ListView
         var emptyView: View = view.findViewById(R.id.empty_LinearLayout)
 
         var printers = getPrinters()
-        var adapter: MainAdapter = MainAdapter(printers,activity)
+        var adapter: MainAdapter = MainAdapter(printers, activity)
+
+        printerListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            var instance:String? = null
+            var name:String = printers[position].name
+            if (printers[position].instance.length > 0) {
+                instance = printers[position].instance
+            }
+            Log.d("prepared",instance+"---->"+name);
+            var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name,instance))
+            dialog.show()
+        }
 
         printerListView.emptyView = emptyView;
         printerListView.adapter = adapter
