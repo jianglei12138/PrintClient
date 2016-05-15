@@ -59,21 +59,7 @@ class AddFragment : Fragment() {
             override fun onFound(newDevices: Device) {
                 Log.e("JNIEnv", newDevices.deviceClass + " " + newDevices.deviceId + " " + newDevices.deviceInfo + " " + newDevices.deviceLocaton + " " + newDevices.deviceMakeModel + " " + newDevices.deviceUri)
                 var result = CleftDevice.cleftDevice(newDevices, activity)
-
-                for (i in data.indices) {
-                    if (data[i] is String && data[i].equals(result)) {
-                        data.add(i + 1, newDevices)
-                        break
-                    }
-                }
-
-
-                data.forEach {
-                    if (it is String)
-                        Log.e("error", it)
-                    else
-                        Log.e("error", (it as Device).deviceInfo)
-                }
+                data.add(data.indexOf(result) + 1, newDevices)
                 adapter.notifyDataSetChanged()
             }
 

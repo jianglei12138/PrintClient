@@ -35,6 +35,8 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
             holder.title.text = data.toString()
         } else if (holder is PrinterTextHolder) {
             holder.text.text = (data as Device).deviceInfo
+            holder.makemodel.text = context.getString(R.string.makemodel) + ": " + data.deviceMakeModel
+            holder.uri.text = "uri: " + data.deviceUri
         }
     }
 
@@ -77,9 +79,13 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
 
     inner class PrinterTextHolder(view: View) : AffixAdapter.ViewHolder(view) {
         var text: TextView
+        var uri: TextView
+        var makemodel: TextView
 
         init {
             text = view.findViewById(R.id.text) as TextView
+            uri = view.findViewById(R.id.uri) as TextView
+            makemodel = view.findViewById(R.id.makemodel) as TextView
         }
 
     }

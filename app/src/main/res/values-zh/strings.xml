@@ -26,4 +26,5 @@
     <string name="job_hold_until">保持作业时间</string>
     <string name="marker_change_time">标记更改时间</string>
     <string name="number_up">列举</string>
+    <string name="makemodel">制造商型号</string>
 </resources>
