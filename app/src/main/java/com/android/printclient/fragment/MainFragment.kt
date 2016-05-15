@@ -23,6 +23,7 @@ class MainFragment : Fragment() {
 
     external fun getPrinters(): List<Printer>
     external fun getAttributePrinter(name: String, instance: String?): HashMap<String, String>
+    external fun checkCupsd():Boolean
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //inflater view
