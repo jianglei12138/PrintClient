@@ -27,4 +27,21 @@
     <string name="marker_change_time">标记更改时间</string>
     <string name="number_up">列举</string>
     <string name="makemodel">制造商型号</string>
+    <string name="example_sentence">
+        <td>例如:\n
+            <pre>\n
+                &#160;&#160;&#160;&#160;http://hostname:631/ipp/\n
+                &#160;&#160;&#160;&#160;http://hostname:631/ipp/port1\n
+                &#160;&#160;&#160;&#160;\n
+                &#160;&#160;&#160;&#160;ipp://hostname/ipp/\n
+                &#160;&#160;&#160;&#160;ipp://hostname/ipp/port1\n
+                &#160;&#160;&#160;&#160;\n
+                &#160;&#160;&#160;&#160;lpd://hostname/queue\n
+                &#160;&#160;&#160;&#160;\n
+                &#160;&#160;&#160;&#160;socket://hostname\n
+                &#160;&#160;&#160;&#160;socket://hostname:9100\n
+            </pre>\n
+            <p>更多信息，参看<a href="#">"网络打印机"</a> </p>
+        </td>
+    </string>
 </resources>

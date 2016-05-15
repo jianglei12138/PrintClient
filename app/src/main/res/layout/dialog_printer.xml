@@ -27,6 +27,7 @@
         android:layout_gravity="right"
         android:padding="@dimen/activity_horizontal_margin"
         android:text="确定"
+        android:foreground="?selectableItemBackground"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/accent_material_light" />
 

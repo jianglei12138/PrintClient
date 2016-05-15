@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.android.printclient.R
 import com.android.printclient.objects.Device
+import com.android.printclient.view.DeviceDialog
 
 /**
  * Created by jianglei on 16/4/30.
@@ -86,6 +87,11 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
             text = view.findViewById(R.id.text) as TextView
             uri = view.findViewById(R.id.uri) as TextView
             makemodel = view.findViewById(R.id.makemodel) as TextView
+
+            view.setOnClickListener {
+                var dialog = DeviceDialog(context,uri.text.substring(5))
+                dialog.show()
+            }
         }
 
     }
