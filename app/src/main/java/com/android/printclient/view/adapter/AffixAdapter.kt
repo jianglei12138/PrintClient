@@ -7,19 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.printclient.R
+import com.android.printclient.objects.Device
 
 /**
  * Created by jianglei on 16/4/30.
  */
-class AddAdapter : RecyclerView.Adapter<AddAdapter.ViewHolder> {
+class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
 
     private val TYPE_TITLE = 1
     private val TYPE_TEXT = 2
 
-    private var mDataset: List<String>
+    private var mDataset: List<Any>
     private var context: Context
 
-    constructor(mDataset: List<String>, context: Context) {
+    constructor(mDataset: List<Any>, context: Context) {
         this.mDataset = mDataset
         this.context = context
     }
@@ -29,11 +30,11 @@ class AddAdapter : RecyclerView.Adapter<AddAdapter.ViewHolder> {
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        var data:String = mDataset.get(position)
+        var data: Any = mDataset.get(position)
         if (holder is PrinterTitleHolder) {
-            holder.title.text = data
-        } else if(holder is PrinterTextHolder){
-            holder.text.text = data
+            holder.title.text = data.toString()
+        } else if (holder is PrinterTextHolder) {
+            holder.text.text = (data as Device).deviceInfo
         }
     }
 
@@ -65,7 +66,7 @@ class AddAdapter : RecyclerView.Adapter<AddAdapter.ViewHolder> {
 
     abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
 
-    inner class PrinterTitleHolder(view: View) : AddAdapter.ViewHolder(view) {
+    inner class PrinterTitleHolder(view: View) : AffixAdapter.ViewHolder(view) {
         var title: TextView
 
         init {
@@ -74,7 +75,7 @@ class AddAdapter : RecyclerView.Adapter<AddAdapter.ViewHolder> {
 
     }
 
-    inner class PrinterTextHolder(view: View) : AddAdapter.ViewHolder(view) {
+    inner class PrinterTextHolder(view: View) : AffixAdapter.ViewHolder(view) {
         var text: TextView
 
         init {

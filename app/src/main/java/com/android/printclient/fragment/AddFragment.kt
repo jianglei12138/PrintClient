@@ -11,7 +11,8 @@ import android.view.ViewGroup
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.objects.Device
-import com.android.printclient.view.adapter.AddAdapter
+import com.android.printclient.utility.CleftDevice
+import com.android.printclient.view.adapter.AffixAdapter
 import java.util.*
 
 /**
@@ -30,6 +31,8 @@ class AddFragment : Fragment() {
         fun onFinish()
     }
 
+    var data = ArrayList<Any>()
+
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //inflater
@@ -44,13 +47,37 @@ class AddFragment : Fragment() {
         waysRecyclerView.setHasFixedSize(true)
         waysRecyclerView.layoutManager = LinearLayoutManager(activity)
 
+        //init data list
+        data.add(activity.getString(R.string.local_printer))
+        data.add(activity.getString(R.string.network_printer))
+        data.add(activity.getString(R.string.other_printer))
+
+        var adapter = AffixAdapter(data, activity)
+        waysRecyclerView.adapter = adapter
+
         getDevices(object : OnFoundDeviceListener {
             override fun onFound(newDevices: Device) {
-                Log.e("callback",newDevices.deviceClass + "  "+ newDevices.deviceId)
+                Log.e("JNIEnv", newDevices.deviceClass + " " + newDevices.deviceId + " " + newDevices.deviceInfo + " " + newDevices.deviceLocaton + " " + newDevices.deviceMakeModel + " " + newDevices.deviceUri)
+                var result = CleftDevice.cleftDevice(newDevices, activity)
+
+                for (i in data.indices) {
+                    if (data[i] is String && data[i].equals(result)) {
+                        data.add(i + 1, newDevices)
+                        break
+                    }
+                }
+
+
+                data.forEach {
+                    if (it is String)
+                        Log.e("error", it)
+                    else
+                        Log.e("error", (it as Device).deviceInfo)
+                }
+                adapter.notifyDataSetChanged()
             }
 
             override fun onFinish() {
-
             }
         })
 
