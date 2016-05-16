@@ -3,15 +3,16 @@ package com.android.printclient.view
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.text.Html
-import android.util.Log
+import android.support.design.widget.Snackbar
+import android.support.v7.widget.AppCompatEditText
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import com.android.printclient.R
-import com.android.printclient.utility.Translate
-import java.util.*
 
 /**
  * Created by jianglei on 16/5/14.
@@ -28,6 +29,14 @@ class DeviceDialog : Dialog {
 
     var nextTextView: TextView? = null
     var beforeTextView: TextView? = null
+
+    var uriEditText: AppCompatEditText? = null
+
+    var uriTextView: TextView? = null
+    var nameEditText: AppCompatEditText? = null
+    var descriptionEditText: AppCompatEditText? = null
+    var locationEditText: AppCompatEditText? = null
+    var shareCheckBox: CheckBox? = null
 
     constructor(context: Context, uri: String) : super(context) {
         this.uri = uri
@@ -71,6 +80,22 @@ class DeviceDialog : Dialog {
 
         nextTextView!!.setOnClickListener({
             view ->
+            if (tabhost!!.currentTab == 0) {
+                if (uriEditText!!.text.toString().contains(":/")) {
+                    uriTextView!!.text = uriEditText!!.text
+                } else {
+                    Snackbar.make(view, context.getString(R.string.uri_format_error), Snackbar.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+            }
+            if (tabhost!!.currentTab == 1) {
+                var namePrinter = nameEditText!!.text.toString()
+                if (TextUtils.isEmpty(namePrinter) || namePrinter.length > 127 || namePrinter.contains(" ") || namePrinter.contains("/") || namePrinter.contains("#")) {
+                    Snackbar.make(view, context.getString(R.string.ex_printer_name_attention), Snackbar.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+            }
+
             if (tabhost!!.currentTab == tabTitle.size - 1) {
                 //确认添加
                 return@setOnClickListener
@@ -96,6 +121,9 @@ class DeviceDialog : Dialog {
             tabhost!!.currentTab = tabhost!!.currentTab - 1
         })
 
+        if (uri!!.contains(":/"))
+            uriTextView!!.text = uri
+
     }
 
     private fun initPpdTab() {
@@ -103,12 +131,23 @@ class DeviceDialog : Dialog {
     }
 
     private fun initDetailTab() {
-
+        nameEditText = findViewById(R.id.name_editText) as AppCompatEditText
+        descriptionEditText = findViewById(R.id.description_editText) as AppCompatEditText
+        locationEditText = findViewById(R.id.location_editText) as AppCompatEditText
+        uriTextView = findViewById(R.id.uri_textView) as TextView
+        shareCheckBox = findViewById(R.id.share_checkBox) as CheckBox
     }
 
     private fun initAddTab() {
-        var uriEditText = findViewById(R.id.uri_editText) as android.support.v7.widget.AppCompatEditText
-        uriEditText.hint = uri
+        uriEditText = findViewById(R.id.uri_editText) as AppCompatEditText
+        if (uri!!.contains(":/")) {
+            uriEditText!!.hint = uri
+            uriEditText!!.setText(uri)
+        } else {
+            uriEditText!!.hint = uri + "://"
+            uriEditText!!.setText(uri + "://")
+        }
+
     }
 
     fun setFirstTab(position: Int) {

@@ -47,4 +47,9 @@
     <string name="ok">确定</string>
     <string name="next_step">下一步</string>
     <string name="before_step">上一步</string>
+    <string name="uri_format_error">链接格式不正确，必须包含://</string>
+    <string name="ex_printer_name">例如: 我的打印机</string>
+    <string name="ex_printer_description">例如: 这是一台XXX打印机</string>
+    <string name="ex_printer_location">例如: 我的办公室</string>
+    <string name="ex_printer_name_attention">名称最多包含127个字符(不包含特殊符号)</string>
 </resources>
