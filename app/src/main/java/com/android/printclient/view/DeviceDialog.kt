@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.view.Display
-import android.widget.EditText
-import android.widget.ListView
-import android.widget.SimpleAdapter
-import android.widget.TextView
+import android.view.LayoutInflater
+import android.widget.*
 import com.android.printclient.R
 import com.android.printclient.utility.Translate
 import java.util.*
@@ -19,12 +17,16 @@ import java.util.*
  */
 class DeviceDialog : Dialog {
 
+    var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
+    var currentTab = 0
+    var startIndex = 0
+
     val SCREEN_DIALOG_RATE: Float = 0.96.toFloat()
-    var mcontext: Context? = null
     var uri: String? = null
 
+    var tabhost: TabHost? = null
+
     constructor(context: Context, uri: String) : super(context) {
-        this.mcontext = context
         this.uri = uri
     }
 
@@ -37,13 +39,51 @@ class DeviceDialog : Dialog {
         param.width = (display.width * SCREEN_DIALOG_RATE).toInt()
         this.window.attributes = param;
 
-        var titleTextView: TextView = findViewById(R.id.title_textView) as TextView
-        var certainTextView: TextView = findViewById(R.id.certain_textView) as TextView
-        var sampleTextView: TextView = findViewById(R.id.sample_textView) as TextView
+
+        //for tabhost
+        tabhost = findViewById(R.id.dialog_tabHost) as TabHost
+        tabhost!!.setup()
+
+        LayoutInflater.from(context).inflate(R.layout.tab_addprinter, tabhost!!.tabContentView)
+        LayoutInflater.from(context).inflate(R.layout.tab_adddetail, tabhost!!.tabContentView)
+        LayoutInflater.from(context).inflate(R.layout.tab_addppd, tabhost!!.tabContentView)
+
+
+        tabhost!!.addTab(tabhost!!.newTabSpec(tabTitle[0]).setIndicator("add_tab").setContent(R.id.add_tab))
+        tabhost!!.addTab(tabhost!!.newTabSpec(tabTitle[1]).setIndicator("detail_tab").setContent(R.id.detail_tab))
+        tabhost!!.addTab(tabhost!!.newTabSpec(tabTitle[2]).setIndicator("ppd_tab").setContent(R.id.ppd_tab))
+
+        //var titleTextView: TextView = findViewById(R.id.title_textView) as TextView
+        var nextTextView: TextView = findViewById(R.id.next_textView) as TextView
+        var beforeTextView: TextView = findViewById(R.id.before_textView) as TextView
+
+        initAddTab()
+        initDetailTab()
+        initPpdTab()
+
+        nextTextView.setOnClickListener({ view -> tabhost!!.setCurrentTabByTag(tabTitle[(++currentTab) % 3]) })
+        beforeTextView.setOnClickListener({ view -> tabhost!!.setCurrentTabByTag(tabTitle[(--currentTab) % 3]) })
+
+    }
+
+    private fun initPpdTab() {
+
+    }
+
+    private fun initDetailTab() {
+
+    }
+
+    private fun initAddTab() {
         var uriEditText = findViewById(R.id.uri_editText) as android.support.v7.widget.AppCompatEditText
-
         uriEditText.hint = uri
+    }
 
-        certainTextView.setOnClickListener({ view -> dismiss() })
+
+
+    fun setFirstTab(position: Int) {
+        tabhost!!.currentTab = position
+        startIndex = position
+
     }
 }

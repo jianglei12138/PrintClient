@@ -89,8 +89,10 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
             makemodel = view.findViewById(R.id.makemodel) as TextView
 
             view.setOnClickListener {
-                var dialog = DeviceDialog(context,uri.text.substring(5))
+                var dialog = DeviceDialog(context, uri.text.substring(5))
                 dialog.show()
+                if(uri.text.substring(5).contains(":"))
+                    dialog.setFirstTab(1)
             }
         }
 
