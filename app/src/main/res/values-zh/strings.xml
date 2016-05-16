@@ -44,4 +44,7 @@
             <p>更多信息，参看<a href="#">"网络打印机"</a> </p>
         </td>
     </string>
+    <string name="ok">确定</string>
+    <string name="next_step">下一步</string>
+    <string name="before_step">上一步</string>
 </resources>

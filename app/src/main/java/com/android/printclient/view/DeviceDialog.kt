@@ -7,6 +7,7 @@ import android.text.Html
 import android.util.Log
 import android.view.Display
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.*
 import com.android.printclient.R
 import com.android.printclient.utility.Translate
@@ -18,13 +19,15 @@ import java.util.*
 class DeviceDialog : Dialog {
 
     var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
-    var currentTab = 0
     var startIndex = 0
 
     val SCREEN_DIALOG_RATE: Float = 0.96.toFloat()
     var uri: String? = null
 
     var tabhost: TabHost? = null
+
+    var nextTextView: TextView? = null
+    var beforeTextView: TextView? = null
 
     constructor(context: Context, uri: String) : super(context) {
         this.uri = uri
@@ -54,15 +57,44 @@ class DeviceDialog : Dialog {
         tabhost!!.addTab(tabhost!!.newTabSpec(tabTitle[2]).setIndicator("ppd_tab").setContent(R.id.ppd_tab))
 
         //var titleTextView: TextView = findViewById(R.id.title_textView) as TextView
-        var nextTextView: TextView = findViewById(R.id.next_textView) as TextView
-        var beforeTextView: TextView = findViewById(R.id.before_textView) as TextView
+        nextTextView = findViewById(R.id.next_textView) as TextView
+        beforeTextView = findViewById(R.id.before_textView) as TextView
+
+        //init
+        beforeTextView!!.visibility = View.GONE
+        tabhost!!.currentTab = startIndex
+        beforeTextView!!.text = context.getString(R.string.before_step)
 
         initAddTab()
         initDetailTab()
         initPpdTab()
 
-        nextTextView.setOnClickListener({ view -> tabhost!!.setCurrentTabByTag(tabTitle[(++currentTab) % 3]) })
-        beforeTextView.setOnClickListener({ view -> tabhost!!.setCurrentTabByTag(tabTitle[(--currentTab) % 3]) })
+        nextTextView!!.setOnClickListener({
+            view ->
+            if (tabhost!!.currentTab == tabTitle.size - 1) {
+                //确认添加
+                return@setOnClickListener
+            }
+            if (tabhost!!.currentTab == startIndex) {
+                nextTextView!!.text = context.getString(R.string.next_step)
+                beforeTextView!!.visibility = View.VISIBLE
+            }
+            if (tabhost!!.currentTab == tabTitle.size - 2) {
+                nextTextView!!.text = context.getString(R.string.ok)
+            }
+            tabhost!!.currentTab = tabhost!!.currentTab + 1
+        })
+        beforeTextView!!.setOnClickListener({ view ->
+            if (tabhost!!.currentTab == startIndex) {
+                return@setOnClickListener
+            } else if (tabhost!!.currentTab == tabTitle.size - 1) {
+                nextTextView!!.text = context.getString(R.string.next_step)
+            }
+            if (tabhost!!.currentTab == startIndex + 1) {
+                beforeTextView!!.visibility = View.INVISIBLE
+            }
+            tabhost!!.currentTab = tabhost!!.currentTab - 1
+        })
 
     }
 
@@ -79,11 +111,9 @@ class DeviceDialog : Dialog {
         uriEditText.hint = uri
     }
 
-
-
     fun setFirstTab(position: Int) {
-        tabhost!!.currentTab = position
         startIndex = position
-
+        tabhost!!.currentTab = position
     }
+
 }
