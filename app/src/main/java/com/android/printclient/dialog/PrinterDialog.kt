@@ -1,4 +1,4 @@
-package com.android.printclient.view
+package com.android.printclient.dialog
 
 import android.app.Dialog
 import android.content.Context

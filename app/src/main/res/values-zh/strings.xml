@@ -52,4 +52,5 @@
     <string name="ex_printer_description">例如: 这是一台XXX打印机</string>
     <string name="ex_printer_location">例如: 我的办公室</string>
     <string name="ex_printer_name_attention">名称最多包含127个字符(不包含特殊符号)</string>
+    <string name="ppd_attention">请选择或提供适合您打印设备的PPD文件，以便我们更好的控制你的打印设备。</string>
 </resources>

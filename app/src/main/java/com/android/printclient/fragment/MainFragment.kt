@@ -11,7 +11,7 @@ import android.widget.ListView
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.objects.Printer
-import com.android.printclient.view.PrinterDialog
+import com.android.printclient.dialog.PrinterDialog
 import com.android.printclient.view.adapter.MainAdapter
 import java.util.*
 
@@ -45,7 +45,7 @@ class MainFragment : Fragment() {
             if (printers[position].instance.length > 0) {
                 instance = printers[position].instance
             }
-            var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name,instance),name)
+            var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name, instance), name)
             dialog.show()
         }
 

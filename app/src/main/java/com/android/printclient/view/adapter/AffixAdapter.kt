@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.android.printclient.R
 import com.android.printclient.objects.Device
-import com.android.printclient.view.DeviceDialog
+import com.android.printclient.dialog.DeviceDialog
 
 /**
  * Created by jianglei on 16/4/30.

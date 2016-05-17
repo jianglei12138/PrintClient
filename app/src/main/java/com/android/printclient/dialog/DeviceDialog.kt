@@ -1,8 +1,9 @@
-package com.android.printclient.view
+package com.android.printclient.dialog
 
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.AppCompatEditText
 import android.text.Editable
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import com.android.printclient.R
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/14.
@@ -50,7 +52,6 @@ class DeviceDialog : Dialog {
         val param = window.attributes
         param.width = (display.width * SCREEN_DIALOG_RATE).toInt()
         this.window.attributes = param;
-
 
         //for tabhost
         tabhost = findViewById(R.id.dialog_tabHost) as TabHost
@@ -127,7 +128,9 @@ class DeviceDialog : Dialog {
     }
 
     private fun initPpdTab() {
-
+        //select ppds from database
+        var makeSpinner = findViewById(R.id.make_spinner) as Spinner
+        var modelSpinner = findViewById(R.id.model_spinner) as Spinner
     }
 
     private fun initDetailTab() {
@@ -154,5 +157,4 @@ class DeviceDialog : Dialog {
         startIndex = position
         tabhost!!.currentTab = position
     }
-
 }
