@@ -9,11 +9,13 @@ import android.support.v7.widget.AppCompatEditText
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import com.android.printclient.R
+import com.android.printclient.data.PpdDB
 import java.util.*
 
 /**
@@ -39,6 +41,8 @@ class DeviceDialog : Dialog {
     var descriptionEditText: AppCompatEditText? = null
     var locationEditText: AppCompatEditText? = null
     var shareCheckBox: CheckBox? = null
+
+    var db = PpdDB(context)
 
     constructor(context: Context, uri: String) : super(context) {
         this.uri = uri
@@ -131,6 +135,27 @@ class DeviceDialog : Dialog {
         //select ppds from database
         var makeSpinner = findViewById(R.id.make_spinner) as Spinner
         var modelSpinner = findViewById(R.id.model_spinner) as Spinner
+
+        var itemMake = db.getAllMake()
+        itemMake.add(0, context.getString(R.string.printer_make))
+        var adapterMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemMake.toTypedArray())
+        makeSpinner.adapter = adapterMake
+
+        makeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position == 0) return
+                var itemModel = db.getModelByMake(itemMake[position])
+                itemModel.add(0, context.getString(R.string.printer_model))
+                var adapterModel = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModel.toTypedArray())
+                modelSpinner.adapter = adapterModel
+            }
+
+        }
+
     }
 
     private fun initDetailTab() {

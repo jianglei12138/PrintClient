@@ -4,6 +4,10 @@ import android.content.ContentValues
 import android.content.Context
 import android.util.Log
 import com.android.printclient.objects.Ppd
+import com.android.printclient.utility.ListUtil
+import org.jetbrains.anko.db.dropTable
+import org.jetbrains.anko.db.select
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/17.
@@ -20,6 +24,7 @@ class PpdDB(context: Context) {
     val dbHelper: DBHelper = DBHelper.instance.getInstance(context)
 
     fun insertPpds(ppds: List<Ppd>) = dbHelper.use {
+        dropTable(PpdTable.NAME, true)
         ppds.forEach {
             with(it) {
                 val cv = ContentValues()
@@ -40,5 +45,30 @@ class PpdDB(context: Context) {
     fun initPpds() {
         insertPpds(getPpds())
         release()
+    }
+
+    fun getAllMake(): ArrayList<String> = dbHelper.use {
+        select(PpdTable.NAME, "ppd_make").exec {
+            var make = ArrayList<String>()
+            while (moveToNext())
+                make.add(getString(getColumnIndex("ppd_make")))
+            //do distinct
+            var result = ArrayList<String>()
+            make.forEach {
+                if (!ListUtil.containsIgnoreCase(result, it)) {
+                    result.add(it)
+                }
+            }
+            let { result }
+        }
+    }
+
+    fun getModelByMake(make: String): ArrayList<String> = dbHelper.use {
+        select(PpdTable.NAME, "ppd_make_and_model").where("ppd_make = {ppd_make}", "ppd_make" to make).exec {
+            var model = ArrayList<String>()
+            while (moveToNext())
+                model.add(getString(getColumnIndex("ppd_make_and_model")))
+            let { model }
+        }
     }
 }

@@ -48,14 +48,12 @@
                 android:id="@+id/make_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/detail_padding"
                 android:spinnerMode="dropdown" />
 
             <Spinner
                 android:id="@+id/model_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/detail_padding"
                 android:spinnerMode="dropdown" />
 
         </LinearLayout>
