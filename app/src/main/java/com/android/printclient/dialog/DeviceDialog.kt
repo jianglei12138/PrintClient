@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
@@ -19,6 +20,8 @@ import android.widget.*
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
+import com.android.printclient.utility.UriUtil
+import java.io.File
 import java.util.*
 
 /**
@@ -210,7 +213,8 @@ class DeviceDialog : Dialog {
 
     class ResultPPDFile : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            ppdTextView!!.text = intent!!.getStringExtra("ppd")
+            var uri = intent!!.getStringExtra("ppd")
+            ppdTextView!!.text = UriUtil.uri2Name(Uri.parse(uri),context!!)
         }
 
     }

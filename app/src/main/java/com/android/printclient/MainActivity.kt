@@ -14,6 +14,7 @@ import com.android.printclient.dialog.DeviceDialog
 import com.android.printclient.fragment.AddFragment
 import com.android.printclient.fragment.MainFragment
 import com.android.printclient.objects.Printer
+import com.android.printclient.utility.UriUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.async
 import java.io.File
@@ -85,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK && requestCode == FILE_SELECT_CODE && data != null) {
             var resultIntent = Intent(CHOOSE_PPD_ACTION)
             //data.action = CHOOSE_PPD_ACTION
-            resultIntent.putExtra("ppd", File(data.data.path).absolutePath);
+            resultIntent.putExtra("ppd", data.data.toString());
             sendBroadcast(resultIntent)
         }
         super.onActivityResult(requestCode, resultCode, data)
