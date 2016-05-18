@@ -52,7 +52,7 @@ class AddFragment : Fragment() {
         data.add(activity.getString(R.string.network_printer))
         data.add(activity.getString(R.string.other_printer))
 
-        var adapter = AffixAdapter(data, activity)
+        var adapter = AffixAdapter(data, context,activity)
         waysRecyclerView.adapter = adapter
 
         getDevices(object : OnFoundDeviceListener {

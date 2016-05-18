@@ -1,7 +1,9 @@
 package com.android.printclient.dialog
 
 import android.app.Dialog
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.Snackbar
@@ -14,6 +16,7 @@ import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
 import java.util.*
@@ -22,6 +25,10 @@ import java.util.*
  * Created by jianglei on 16/5/14.
  */
 class DeviceDialog : Dialog {
+
+    companion object {
+        var ppdTextView: TextView? = null
+    }
 
     var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
     var startIndex = 0
@@ -141,21 +148,39 @@ class DeviceDialog : Dialog {
         var adapterMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemMake.toTypedArray())
         makeSpinner.adapter = adapterMake
 
+        var itemModel = arrayOf(context.getString(R.string.printer_model))
+        val adapterModel = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModel)
+        modelSpinner.adapter = adapterModel
+
         makeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (position == 0) return
-                var itemModel = db.getModelByMake(itemMake[position])
-                itemModel.add(0, context.getString(R.string.printer_model))
-                var adapterModel = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModel.toTypedArray())
                 modelSpinner.adapter = adapterModel
             }
 
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position == 0) {
+                    modelSpinner.adapter = adapterModel
+                    return
+                }
+                val itemModelByMake = db.getModelByMake(itemMake[position])
+                itemModelByMake.add(0, context.getString(R.string.printer_model))
+                val adapterModelByMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModelByMake.toTypedArray())
+                modelSpinner.adapter = adapterModelByMake
+            }
         }
+        var chooseTextView = findViewById(R.id.choose_textView)
+        chooseTextView.setOnClickListener { choosePpd() }
+        ppdTextView = findViewById(R.id.ppd_TextView) as TextView?
 
+    }
+
+    private fun choosePpd() {
+        var intent = Intent(Intent.ACTION_GET_CONTENT);
+        intent.type = "*/*"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+
+        //set ownerActivity first
+        ownerActivity.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_ppd)), MainActivity.FILE_SELECT_CODE)
     }
 
     private fun initDetailTab() {
@@ -181,5 +206,12 @@ class DeviceDialog : Dialog {
     fun setFirstTab(position: Int) {
         startIndex = position
         tabhost!!.currentTab = position
+    }
+
+    class ResultPPDFile : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            ppdTextView!!.text = intent!!.getStringExtra("ppd")
+        }
+
     }
 }

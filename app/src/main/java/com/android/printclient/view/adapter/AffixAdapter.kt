@@ -1,5 +1,6 @@
 package com.android.printclient.view.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -20,10 +21,12 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
 
     private var mDataset: List<Any>
     private var context: Context
+    private var activity: Activity
 
-    constructor(mDataset: List<Any>, context: Context) {
+    constructor(mDataset: List<Any>, context: Context, activity: Activity) {
         this.mDataset = mDataset
         this.context = context
+        this.activity = activity
     }
 
     override fun getItemCount(): Int {
@@ -90,8 +93,9 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
 
             view.setOnClickListener {
                 var dialog = DeviceDialog(context, uri.text.substring(5))
+                dialog.ownerActivity = activity
                 dialog.show()
-                if(uri.text.substring(5).contains(":"))
+                if (uri.text.substring(5).contains(":"))
                     dialog.setFirstTab(1)
             }
         }
