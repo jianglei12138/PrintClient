@@ -36,18 +36,19 @@ class MainActivity : AppCompatActivity() {
                     .beginTransaction()
                     .add(container_CoordinatorLayout.id, MainFragment())
                     .commit()
-            search_ActionButton.setOnClickListener() {
-                //switch fragment
-                supportFragmentManager
-                        .beginTransaction()
-                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                        .addToBackStack("add") //for back key
-                        .replace(container_CoordinatorLayout.id, AddFragment())
-                        .commit()
-                //hide fab
-                search_ActionButton.visibility = View.GONE
-            }
         }
+        search_ActionButton.setOnClickListener() {
+            //switch fragment
+            supportFragmentManager
+                    .beginTransaction()
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack("add") //for back key
+                    .replace(container_CoordinatorLayout.id, AddFragment())
+                    .commit()
+            //hide fab
+            search_ActionButton.visibility = View.GONE
+        }
+
         var filter = IntentFilter()
         filter.addAction(CHOOSE_PPD_ACTION)
         filter.priority = Int.MAX_VALUE
