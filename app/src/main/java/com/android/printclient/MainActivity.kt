@@ -1,23 +1,17 @@
 package com.android.printclient
 
-import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import com.android.printclient.data.PpdDB
 import com.android.printclient.dialog.DeviceDialog
 import com.android.printclient.fragment.AddFragment
 import com.android.printclient.fragment.MainFragment
-import com.android.printclient.objects.Printer
-import com.android.printclient.utility.UriUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.async
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,29 +30,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //add fragment
-        supportFragmentManager
-                .beginTransaction()
-                .add(container_CoordinatorLayout.id, MainFragment())
-                .commit()
-        search_ActionButton.setOnClickListener() {
-            //switch fragment
+        if (savedInstanceState == null) {
+            //add fragment
             supportFragmentManager
                     .beginTransaction()
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .addToBackStack("add") //for back key
-                    .replace(container_CoordinatorLayout.id, AddFragment())
+                    .add(container_CoordinatorLayout.id, MainFragment())
                     .commit()
-            //hide fab
-            search_ActionButton.visibility = View.GONE
+            search_ActionButton.setOnClickListener() {
+                //switch fragment
+                supportFragmentManager
+                        .beginTransaction()
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .addToBackStack("add") //for back key
+                        .replace(container_CoordinatorLayout.id, AddFragment())
+                        .commit()
+                //hide fab
+                search_ActionButton.visibility = View.GONE
+            }
         }
-
         var filter = IntentFilter()
         filter.addAction(CHOOSE_PPD_ACTION)
         filter.priority = Int.MAX_VALUE
         registerReceiver(receiver, filter)
 
         asyncPpds()
+
     }
 
     private fun asyncPpds() {
