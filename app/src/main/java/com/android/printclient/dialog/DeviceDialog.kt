@@ -4,15 +4,10 @@ import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.AppCompatEditText
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
-import android.util.Log
 import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
@@ -20,9 +15,7 @@ import android.widget.*
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
-import com.android.printclient.utility.UriUtil
-import java.io.File
-import java.util.*
+import com.android.printclient.utility.FileUtil
 
 /**
  * Created by jianglei on 16/5/14.
@@ -31,7 +24,15 @@ class DeviceDialog : Dialog {
 
     companion object {
         var ppdTextView: TextView? = null
+        var ppd: String? = null
     }
+
+    init {
+        System.loadLibrary("printer")
+    }
+
+    external fun addPrinter(type: Int, ppd: String, printer: String, uri: String, isShared: Boolean, location: String, info: String):Boolean
+
 
     var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
     var startIndex = 0
@@ -112,7 +113,19 @@ class DeviceDialog : Dialog {
             }
 
             if (tabhost!!.currentTab == tabTitle.size - 1) {
-                //确认添加
+                //add printer,first check system provide ppd
+
+                if (!TextUtils.isEmpty(uri)) {
+                    var isShared = shareCheckBox!!.isChecked
+                    var name = nameEditText!!.text.toString()
+                    var uri = uriEditText!!.text.toString()
+                    var ppd = "/data/data/com.android.printclient/files/PDFwriter.ppd"
+                    var location = locationEditText!!.text.toString()
+                    var info = descriptionEditText!!.text.toString()
+                    var result = addPrinter(0,ppd,name,uri,isShared,location,info);
+                    if(!result)
+                        Snackbar.make(view, context.getString(R.string.add_printer_failed), Snackbar.LENGTH_LONG).show()
+                }
                 return@setOnClickListener
             }
             if (tabhost!!.currentTab == startIndex) {
@@ -213,8 +226,8 @@ class DeviceDialog : Dialog {
 
     class ResultPPDFile : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            var uri = intent!!.getStringExtra("ppd")
-            ppdTextView!!.text = UriUtil.uri2Name(Uri.parse(uri),context!!)
+            ppd = intent!!.getStringExtra("ppd")
+            ppdTextView!!.text = FileUtil.getNameByPathWithSuffix(ppd!!)
         }
 
     }

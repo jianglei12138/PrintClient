@@ -48,8 +48,8 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_data_PpdDB_getPpds
     while (attr) {
         attr = ippNextAttribute(response);
         if (ippGetName(attr) != NULL) {
-            const char *name = (ippGetName(attr));
-            ppdString[count++] = (char *) name;
+            const char *value = (char *) ippGetString(attr, 0, NULL);;
+            ppdString[count++] = (char *) value;
         }
     }
     //ppd-name ppd-natural-language ppd-make ppd-make-and-model ppd-device-id ppd-product ppd-psversion ppd-type ppd-model-number

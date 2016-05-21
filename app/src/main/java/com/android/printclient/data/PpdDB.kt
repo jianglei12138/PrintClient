@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.android.printclient.objects.Ppd
 import com.android.printclient.utility.ListUtil
+import org.jetbrains.anko.db.createTable
 import org.jetbrains.anko.db.dropTable
 import org.jetbrains.anko.db.select
 import java.util.*
@@ -24,7 +25,7 @@ class PpdDB(context: Context) {
     val dbHelper: DBHelper = DBHelper.instance.getInstance(context)
 
     fun insertPpds(ppds: List<Ppd>) = dbHelper.use {
-        dropTable(PpdTable.NAME, true)
+        //dropTable(PpdTable.NAME, true)
         ppds.forEach {
             with(it) {
                 val cv = ContentValues()
