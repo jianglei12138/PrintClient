@@ -1,5 +1,6 @@
 package com.android.printclient.dialog
 
+import android.Manifest
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -16,6 +17,7 @@ import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
 import com.android.printclient.utility.FileUtil
+import com.android.printclient.utility.Permission
 
 /**
  * Created by jianglei on 16/5/14.
@@ -31,7 +33,7 @@ class DeviceDialog : Dialog {
         System.loadLibrary("printer")
     }
 
-    external fun addPrinter(type: Int, ppd: String, printer: String, uri: String, isShared: Boolean, location: String, info: String):Boolean
+    external fun addPrinter(type: Int, ppd: String, printer: String, uri: String, isShared: Boolean, location: String, info: String): Boolean
 
 
     var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
@@ -122,8 +124,10 @@ class DeviceDialog : Dialog {
                     var ppd = "/data/data/com.android.printclient/files/PDFwriter.ppd"
                     var location = locationEditText!!.text.toString()
                     var info = descriptionEditText!!.text.toString()
-                    var result = addPrinter(0,ppd,name,uri,isShared,location,info);
-                    if(!result)
+                    var result = addPrinter(0, ppd, name, uri, isShared, location, info);
+                    //request permission
+
+                    if (!result)
                         Snackbar.make(view, context.getString(R.string.add_printer_failed), Snackbar.LENGTH_LONG).show()
                 }
                 return@setOnClickListener

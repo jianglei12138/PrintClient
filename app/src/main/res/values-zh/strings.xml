@@ -57,4 +57,5 @@
     <string name="printer_model">型号</string>
     <string name="choose_ppd">选择对应打印机的PPD文件</string>
     <string name="add_printer_failed">打印机添加失败,请重试</string>
+    <string name="attention_storage_permission">添加打印机需要使用使用存储权限</string>
 </resources>
