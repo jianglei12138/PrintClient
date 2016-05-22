@@ -114,3 +114,11 @@ JNIEXPORT jboolean JNICALL Java_com_android_printclient_dialog_DeviceDialog_addP
 	}
 	return 1;
 }
+
+JNIEXPORT jstring JNICALL Java_com_android_printclient_dialog_DeviceDialog_getServerPpd(
+        JNIEnv *env, jobject jthis, jstring name) {
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    http_t *http_t = gethttp_t();
+    char *ppdfile = cupsGetServerPPD(http_t, (*env)->GetStringUTFChars(env, name, 0));
+    return (*env)->NewStringUTF(env, ppdfile);
+}

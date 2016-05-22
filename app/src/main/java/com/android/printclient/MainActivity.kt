@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK && requestCode == FILE_SELECT_CODE && data != null) {
             var resultIntent = Intent(CHOOSE_PPD_ACTION)
-            resultIntent.putExtra("ppd", FileUtil.getPath(this, data.data));
+            resultIntent.putExtra("ppd",data.data.toString());
             sendBroadcast(resultIntent)
         }
         super.onActivityResult(requestCode, resultCode, data)

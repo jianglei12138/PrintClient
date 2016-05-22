@@ -2,11 +2,8 @@ package com.android.printclient.data
 
 import android.content.ContentValues
 import android.content.Context
-import android.util.Log
 import com.android.printclient.objects.Ppd
 import com.android.printclient.utility.ListUtil
-import org.jetbrains.anko.db.createTable
-import org.jetbrains.anko.db.dropTable
 import org.jetbrains.anko.db.select
 import java.util.*
 
@@ -65,11 +62,20 @@ class PpdDB(context: Context) {
     }
 
     fun getModelByMake(make: String): ArrayList<String> = dbHelper.use {
-        select(PpdTable.NAME, "ppd_make_and_model").where("ppd_make = {ppd_make}", "ppd_make" to make).exec {
+        select(PpdTable.NAME, "ppd_product").where("ppd_make = {ppd_make}", "ppd_make" to make).exec {
             var model = ArrayList<String>()
             while (moveToNext())
-                model.add(getString(getColumnIndex("ppd_make_and_model")))
+                model.add(getString(getColumnIndex("ppd_product")))
             let { model }
+        }
+    }
+
+    fun getNameByMakeAndModel(make: String, model: String) = dbHelper.use {
+        select(PpdTable.NAME, "ppd_name").where("ppd_make = {ppd_make} and ppd_product={ppd_product}", "ppd_make" to make, "ppd_product" to model).exec {
+            var name: String? = null
+            while (moveToNext())
+                name = (getString(getColumnIndex("ppd_name")))
+            let { name!! }
         }
     }
 }

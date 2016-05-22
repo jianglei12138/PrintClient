@@ -1,11 +1,13 @@
 package com.android.printclient.dialog
 
-import android.Manifest
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.AppCompatEditText
 import android.text.TextUtils
@@ -17,7 +19,9 @@ import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
 import com.android.printclient.utility.FileUtil
-import com.android.printclient.utility.Permission
+import com.android.printclient.utility.ThreadUtil
+import java.io.File
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/14.
@@ -26,7 +30,7 @@ class DeviceDialog : Dialog {
 
     companion object {
         var ppdTextView: TextView? = null
-        var ppd: String? = null
+        var ppd: Uri? = null
     }
 
     init {
@@ -34,6 +38,7 @@ class DeviceDialog : Dialog {
     }
 
     external fun addPrinter(type: Int, ppd: String, printer: String, uri: String, isShared: Boolean, location: String, info: String): Boolean
+    external fun getServerPpd(name: String): String
 
 
     var tabTitle = arrayOf("add_tab", "detail_tab", "ppd_tab")
@@ -56,6 +61,25 @@ class DeviceDialog : Dialog {
     var shareCheckBox: CheckBox? = null
 
     var db = PpdDB(context)
+    var modelSpinner: Spinner? = null
+    var makeSpinner: Spinner? = null
+
+    var progressDialog: PrograssDialog? = null
+
+    var handler = object : Handler() {
+        override fun handleMessage(msg: Message?) {
+            when (msg!!.what) {
+                0 -> {
+                    progressDialog!!.dismiss()
+                    var result = msg.obj as Boolean
+                    if (result) Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
+                    else
+                        Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
+                }
+            }
+            super.handleMessage(msg)
+        }
+    }
 
     constructor(context: Context, uri: String) : super(context) {
         this.uri = uri
@@ -115,20 +139,67 @@ class DeviceDialog : Dialog {
             }
 
             if (tabhost!!.currentTab == tabTitle.size - 1) {
-                //add printer,first check system provide ppd
+                if (makeSpinner!!.selectedItemPosition != 0 && modelSpinner!!.selectedItemPosition != 0) {
+                    var make = makeSpinner!!.selectedItem as String
+                    var model = modelSpinner!!.selectedItem as String
+                    var ppdname = getServerPpd(db.getNameByMakeAndModel(make, model))
+                    if (!!TextUtils.isEmpty(ppdname)) {
+                        Snackbar.make(view, context.getString(R.string.ppd_error), Snackbar.LENGTH_LONG).show()
+                    } else {
+                        var isShared = shareCheckBox!!.isChecked
+                        var name = nameEditText!!.text.toString()
+                        var uri = uriEditText!!.text.toString()
+                        var location = locationEditText!!.text.toString()
+                        var info = descriptionEditText!!.text.toString()
+                        dismiss()
+                        progressDialog = PrograssDialog("添加打印机中...", context)
+                        progressDialog!!.show()
 
-                if (!TextUtils.isEmpty(uri)) {
+                        //do add printer
+                        ThreadUtil.execute(Runnable {
+                            var result = addPrinter(0, ppdname, name, uri, isShared, location, info);
+                            var msg = Message.obtain()
+                            with(msg) {
+                                what = 0
+                                obj = result
+                                handler.sendMessage(msg)
+                            }
+                        })
+                    }
+                    return@setOnClickListener
+                }
+
+                //add printer,first check system provide ppd
+                if (!TextUtils.isEmpty(uriEditText!!.text.toString())) {
                     var isShared = shareCheckBox!!.isChecked
                     var name = nameEditText!!.text.toString()
                     var uri = uriEditText!!.text.toString()
-                    var ppd = "/data/data/com.android.printclient/files/PDFwriter.ppd"
                     var location = locationEditText!!.text.toString()
                     var info = descriptionEditText!!.text.toString()
-                    var result = addPrinter(0, ppd, name, uri, isShared, location, info);
-                    //request permission
 
-                    if (!result)
-                        Snackbar.make(view, context.getString(R.string.add_printer_failed), Snackbar.LENGTH_LONG).show()
+                    dismiss()
+                    progressDialog = PrograssDialog("添加打印机中...", context)
+                    progressDialog!!.show()
+
+                    //do add printer
+                    ThreadUtil.execute(Runnable {
+                        //copy the ppd
+                        var uuid = UUID.randomUUID().toString()
+                        var ppdpath = context.filesDir.absolutePath
+                        var outputstream = context.openFileOutput(uuid, Context.MODE_PRIVATE)
+                        var inputstream = context.contentResolver.openInputStream(ppd)
+
+                        FileUtil.copyFile(inputstream, outputstream)
+
+                        var result = addPrinter(0, ppdpath + File.separator + uuid, name, uri, isShared, location, info);
+                        var msg = Message.obtain()
+                        with(msg) {
+                            what = 0
+                            obj = result
+                            handler.sendMessage(msg)
+                        }
+                    })
+
                 }
                 return@setOnClickListener
             }
@@ -160,32 +231,32 @@ class DeviceDialog : Dialog {
 
     private fun initPpdTab() {
         //select ppds from database
-        var makeSpinner = findViewById(R.id.make_spinner) as Spinner
-        var modelSpinner = findViewById(R.id.model_spinner) as Spinner
+        makeSpinner = findViewById(R.id.make_spinner) as Spinner
+        modelSpinner = findViewById(R.id.model_spinner) as Spinner
 
         var itemMake = db.getAllMake()
         itemMake.add(0, context.getString(R.string.printer_make))
         var adapterMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemMake.toTypedArray())
-        makeSpinner.adapter = adapterMake
+        makeSpinner!!.adapter = adapterMake
 
         var itemModel = arrayOf(context.getString(R.string.printer_model))
         val adapterModel = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModel)
-        modelSpinner.adapter = adapterModel
+        modelSpinner!!.adapter = adapterModel
 
-        makeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        makeSpinner!!.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                modelSpinner.adapter = adapterModel
+                modelSpinner!!.adapter = adapterModel
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position == 0) {
-                    modelSpinner.adapter = adapterModel
+                    modelSpinner!!.adapter = adapterModel
                     return
                 }
                 val itemModelByMake = db.getModelByMake(itemMake[position])
                 itemModelByMake.add(0, context.getString(R.string.printer_model))
                 val adapterModelByMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModelByMake.toTypedArray())
-                modelSpinner.adapter = adapterModelByMake
+                modelSpinner!!.adapter = adapterModelByMake
             }
         }
         var chooseTextView = findViewById(R.id.choose_textView)
@@ -201,6 +272,10 @@ class DeviceDialog : Dialog {
 
         //set ownerActivity first
         ownerActivity.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_ppd)), MainActivity.FILE_SELECT_CODE)
+    }
+
+    private fun addPrinter() {
+
     }
 
     private fun initDetailTab() {
@@ -230,8 +305,8 @@ class DeviceDialog : Dialog {
 
     class ResultPPDFile : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            ppd = intent!!.getStringExtra("ppd")
-            ppdTextView!!.text = FileUtil.getNameByPathWithSuffix(ppd!!)
+            ppd = Uri.parse(intent!!.getStringExtra("ppd"))
+            ppdTextView!!.text = ppd!!.path//FileUtil.getNameByPathWithSuffix(context!!, ppd!!)
         }
 
     }
