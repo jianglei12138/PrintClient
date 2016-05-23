@@ -4,31 +4,59 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title_textView"
+    <TabHost
+        android:id="@+id/dialog_tabHost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_margin"
-        android:text="Priner Of Hp conventions"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:layout_gravity="center_horizontal">
 
-    <ListView
-        android:id="@+id/attribute_listView"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </TabHost>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@color/colorDivider"
-        android:dividerHeight="0.3dp"/>
-
-    <TextView
-        android:id="@+id/certain_textView"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="确定"
-        android:foreground="?selectableItemBackground"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/accent_material_light" />
+        android:padding="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/before_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="right"
+            android:foreground="?selectableItemBackground"
+            android:padding="4dp"
+            android:text="上一步"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/accent_material_light" />
+
+        <TextView
+            android:id="@+id/next_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:foreground="?selectableItemBackground"
+            android:padding="4dp"
+            android:text="下一步"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/accent_material_light" />
+    </RelativeLayout>
+
 
 </LinearLayout>

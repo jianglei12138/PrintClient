@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.design.widget.Snackbar
+import android.support.design.widget.TextInputLayout
 import android.support.v7.app.AlertDialog
-import android.support.v7.widget.AppCompatEditText
 import android.text.TextUtils
 import android.view.Display
 import android.view.LayoutInflater
@@ -53,12 +53,12 @@ class DeviceDialog : Dialog {
     var nextTextView: TextView? = null
     var beforeTextView: TextView? = null
 
-    var uriEditText: AppCompatEditText? = null
+    var uriEditText: EditText? = null
 
     var uriTextView: TextView? = null
-    var nameEditText: AppCompatEditText? = null
-    var descriptionEditText: AppCompatEditText? = null
-    var locationEditText: AppCompatEditText? = null
+    var nameEditText: EditText? = null
+    var descriptionEditText: EditText? = null
+    var locationEditText: EditText? = null
     var shareCheckBox: CheckBox? = null
 
     var db = PpdDB(context)
@@ -295,20 +295,17 @@ class DeviceDialog : Dialog {
         ownerActivity.startActivityForResult(Intent.createChooser(intent, context.getString(R.string.choose_ppd)), MainActivity.FILE_SELECT_CODE)
     }
 
-    private fun addPrinter() {
-
-    }
-
     private fun initDetailTab() {
-        nameEditText = findViewById(R.id.name_editText) as AppCompatEditText
-        descriptionEditText = findViewById(R.id.description_editText) as AppCompatEditText
-        locationEditText = findViewById(R.id.location_editText) as AppCompatEditText
-        uriTextView = findViewById(R.id.uri_textView) as TextView
+        nameEditText = (findViewById(R.id.name_editText) as TextInputLayout).editText
+        descriptionEditText = (findViewById(R.id.description_editText) as TextInputLayout).editText
+        locationEditText = (findViewById(R.id.location_editText) as TextInputLayout).editText
+        uriTextView = (findViewById(R.id.uri_textView) as TextInputLayout).editText
+        uriTextView!!.isEnabled = false
         shareCheckBox = findViewById(R.id.share_checkBox) as CheckBox
     }
 
     private fun initAddTab() {
-        uriEditText = findViewById(R.id.uri_editText) as AppCompatEditText
+        uriEditText = (findViewById(R.id.uri_editText) as TextInputLayout).editText
         if (uri!!.contains(":/")) {
             uriEditText!!.hint = uri
             uriEditText!!.setText(uri)

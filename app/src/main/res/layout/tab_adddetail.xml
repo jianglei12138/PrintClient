@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/detail_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,18 +20,19 @@
         android:layout_marginRight="@dimen/activity_margin"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="名字: "
-            android:textColor="@color/colorPrimary" />
-
-        <android.support.v7.widget.AppCompatEditText
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/name_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/ex_printer_name"
-            android:textSize="14sp" />
+            android:hint="@string/ex_printer_name">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@android:color/holo_red_light"
+                android:textSize="14sp" />
+        </android.support.design.widget.TextInputLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -42,18 +42,18 @@
         android:layout_marginRight="@dimen/activity_margin"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="描述: "
-            android:textColor="@color/colorPrimary" />
-
-        <android.support.v7.widget.AppCompatEditText
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/description_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/ex_printer_description"
-            android:textSize="14sp" />
+            android:hint="@string/ex_printer_description">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@android:color/holo_red_light"
+                android:textSize="14sp" />
+        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -63,41 +63,42 @@
         android:layout_marginRight="@dimen/activity_margin"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="位置: "
-            android:textColor="@color/colorPrimary" />
-
-        <android.support.v7.widget.AppCompatEditText
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/location_editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/ex_printer_location"
-            android:textSize="14sp" />
+            android:hint="@string/ex_printer_location">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@android:color/holo_red_light"
+                android:textSize="14sp" />
+        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="@dimen/activity_margin"
         android:layout_marginRight="@dimen/activity_margin"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="链接: "
-            android:textColor="@color/colorPrimary" />
-
-        <TextView
+        <android.support.design.widget.TextInputLayout
             android:id="@+id/uri_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="4dp"
-            android:textSize="14sp" />
+            android:hint="@string/ex_printer_connection">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@android:color/holo_red_light"
+                android:textSize="14sp" />
+        </android.support.design.widget.TextInputLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -111,12 +112,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="共享: "
+            android:text=" 共享: "
             android:textColor="@color/colorPrimary" />
 
         <CheckBox
+            android:id="@+id/share_checkBox"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/share_checkBox" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </LinearLayout>
