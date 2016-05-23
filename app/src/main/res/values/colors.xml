@@ -13,5 +13,6 @@
     <color name="colorDivider">#E7E7E7</color>
     <color name="colorSmallTitle">#707070</color>
     <color name="colorPressed">#78000000</color>
+    <color name="colorTabTitle">#BFBFBF</color>
 
 </resources>

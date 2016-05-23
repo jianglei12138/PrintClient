@@ -3,6 +3,7 @@
     <string name="empty_TextView">没有添加打印机</string>
     <string name="save_printers">现有打印机</string>
     <string name="add_printers">添加打印机</string>
+    <string name="set_options">设置打印机选项</string>
     <string name="local_printer">本地打印机</string>
     <string name="network_printer">搜索到的打印机</string>
     <string name="other_printer">其他网络打印机</string>
@@ -62,4 +63,12 @@
     <string name="attention_storage_permission">添加打印机需要使用使用存储权限</string>
     <string name="ppd_error">没有找到对应打印机厂商的ppd文件</string>
     <string name="show_options">检测到你刚添加了一个打印机,是否配置默认打印选项?</string>
+    <string name="general">常用</string>
+    <string name="banners">标题</string>
+    <string name="policies">策略</string>
+    <string name="printer_settings">打印机设置</string>
+    <string name="port_monitor">端口监视器</string>
+    <string name="options_installed">选项已安装</string>
+    <string name="jcl">作业控制语言</string>
+
 </resources>

@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.android.printclient.R
 import com.android.printclient.objects.Device
 import com.android.printclient.dialog.DeviceDialog
+import com.android.printclient.fragment.AddFragment
 
 /**
  * Created by jianglei on 16/4/30.
@@ -22,11 +23,13 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
     private var mDataset: List<Any>
     private var context: Context
     private var activity: Activity
+    private var listener:AddFragment.OnResultListener
 
-    constructor(mDataset: List<Any>, context: Context, activity: Activity) {
+    constructor(mDataset: List<Any>, context: Context, activity: Activity, listener:AddFragment.OnResultListener) {
         this.mDataset = mDataset
         this.context = context
         this.activity = activity
+        this.listener = listener
     }
 
     override fun getItemCount(): Int {
@@ -92,7 +95,7 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
             makemodel = view.findViewById(R.id.makemodel) as TextView
 
             view.setOnClickListener {
-                var dialog = DeviceDialog(context, uri.text.substring(5))
+                var dialog = DeviceDialog(context, uri.text.substring(5),listener)
                 dialog.ownerActivity = activity
                 dialog.show()
                 if (uri.text.substring(5).contains(":"))

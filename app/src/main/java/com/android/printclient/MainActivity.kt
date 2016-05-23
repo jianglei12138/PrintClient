@@ -1,6 +1,8 @@
 package com.android.printclient
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -13,7 +15,7 @@ import com.android.printclient.data.PpdDB
 import com.android.printclient.dialog.DeviceDialog
 import com.android.printclient.fragment.AddFragment
 import com.android.printclient.fragment.MainFragment
-import com.android.printclient.utility.FileUtil
+import com.android.printclient.fragment.OptionFragment
 import com.android.printclient.utility.Permission
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.async
@@ -30,6 +32,8 @@ class MainActivity : AppCompatActivity() {
 
     var mainFragment: MainFragment = MainFragment()
     var addFragment: AddFragment = AddFragment()
+    var optionFragment: OptionFragment = OptionFragment()
+
     var ppdReceiver = DeviceDialog.ResultPPDFile()
 
     interface RequestCallback {
@@ -41,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
             //add fragment
@@ -66,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 //hide fab
                 search_ActionButton.visibility = View.GONE
             }
-     }
+        }
 
         //filter for choose ppd
         var ppdfilter = IntentFilter()
@@ -96,13 +102,14 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (!addFragment.isHidden)
             search_ActionButton.visibility = View.VISIBLE
+            tabs.visibility = View.GONE
         super.onBackPressed()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK && requestCode == FILE_SELECT_CODE && data != null) {
             var resultIntent = Intent(CHOOSE_PPD_ACTION)
-            resultIntent.putExtra("ppd",data.data.toString());
+            resultIntent.putExtra("ppd", data.data.toString());
             sendBroadcast(resultIntent)
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -128,6 +135,13 @@ class MainActivity : AppCompatActivity() {
 
         } else {
             Snackbar.make(container_CoordinatorLayout, R.string.attention_storage_permission, Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+
+    class FragmentToggle : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            var printer = intent!!.getStringExtra("printer")
         }
     }
 }

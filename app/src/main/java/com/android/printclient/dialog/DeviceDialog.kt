@@ -19,6 +19,7 @@ import android.widget.*
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.data.PpdDB
+import com.android.printclient.fragment.AddFragment
 import com.android.printclient.utility.FileUtil
 import com.android.printclient.utility.ThreadUtil
 import java.io.File
@@ -66,12 +67,14 @@ class DeviceDialog : Dialog {
     var makeSpinner: Spinner? = null
 
     var progressDialog: PrograssDialog? = null
+    var listener: AddFragment.OnResultListener? = null
+
 
     var handler = object : Handler() {
         override fun handleMessage(msg: Message?) {
             when (msg!!.what) {
                 0 -> {
-                    var printer = msg.obj as String
+                    val printer = msg.obj as String
                     progressDialog!!.dismiss()
                     val result = msg.arg1
                     when (result) {
@@ -82,7 +85,8 @@ class DeviceDialog : Dialog {
                                     .setNegativeButton(R.string.cancel, null)
                                     .setPositiveButton(R.string.ok) {
                                         dialog, which ->
-                                        OptionsDialog(context, printer).show()
+                                        dismiss()
+                                        listener!!.onListener(printer)
                                     }
                                     .show()
                         }
@@ -94,8 +98,9 @@ class DeviceDialog : Dialog {
         }
     }
 
-    constructor(context: Context, uri: String) : super(context) {
+    constructor(context: Context, uri: String, listener: AddFragment.OnResultListener) : super(context) {
         this.uri = uri
+        this.listener = listener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

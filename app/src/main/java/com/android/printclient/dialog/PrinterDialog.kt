@@ -9,7 +9,7 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.TextView
 import com.android.printclient.R
-import com.android.printclient.utility.Translate
+import com.android.printclient.utility.AttributeDict
 import java.util.*
 
 /**
@@ -32,7 +32,7 @@ class PrinterDialog : Dialog {
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.dialog_printer)
 
-        val dictionary: HashMap<String, String> = Translate(context).dictionary
+        val dictionary: HashMap<String, String> = AttributeDict(context).dictionary
 
         val display: Display = window.windowManager.defaultDisplay
         val param = window.attributes

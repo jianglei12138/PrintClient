@@ -7,7 +7,7 @@ import java.util.*
 /**
  * Created by jianglei on 16/5/14.
  */
-class Translate(context: Context) {
+class AttributeDict(context: Context) {
     val dictionary = HashMap<String,String>()
     init {
         dictionary.put("copies",context.getString(R.string.copies));
