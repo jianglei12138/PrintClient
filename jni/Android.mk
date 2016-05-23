@@ -47,3 +47,17 @@ LOCAL_CFLAGS := -g -Wall
 LOCAL_LDLIBS := -llog -lcups -lcupscgi
 LOCAL_MODULE:= printer
 include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES:= \
+		src/cups_util.c \
+		src/cups_options.c
+
+LOCAL_C_INCLUDES += \
+    $(LOCAL_PATH)/include \
+    $(LOCAL_PATH)/src \
+
+LOCAL_CFLAGS := -g -Wall
+LOCAL_LDLIBS := -llog -lcups -lcupscgi
+LOCAL_MODULE:= options
+include $(BUILD_SHARED_LIBRARY)

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.AppCompatEditText
 import android.text.TextUtils
 import android.view.Display
@@ -70,11 +71,23 @@ class DeviceDialog : Dialog {
         override fun handleMessage(msg: Message?) {
             when (msg!!.what) {
                 0 -> {
+                    var printer = msg.obj as String
                     progressDialog!!.dismiss()
-                    var result = msg.obj as Boolean
-                    if (result) Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
-                    else
-                        Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
+                    val result = msg.arg1
+                    when (result) {
+                        0 -> Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
+                        1 -> {
+                            Toast.makeText(context, "Add successfully.", Toast.LENGTH_LONG).show()
+                            AlertDialog.Builder(context).setMessage(R.string.show_options)
+                                    .setNegativeButton(R.string.cancel, null)
+                                    .setPositiveButton(R.string.ok) {
+                                        dialog, which ->
+                                        OptionsDialog(context, printer).show()
+                                    }
+                                    .show()
+                        }
+                    }
+
                 }
             }
             super.handleMessage(msg)
@@ -161,9 +174,13 @@ class DeviceDialog : Dialog {
                             var msg = Message.obtain()
                             with(msg) {
                                 what = 0
-                                obj = result
-                                handler.sendMessage(msg)
+                                obj = name
+                                if (result)
+                                    arg1 = 1
+                                else
+                                    arg1 = 0
                             }
+                            handler.sendMessage(msg)
                         })
                     }
                     return@setOnClickListener
@@ -195,9 +212,13 @@ class DeviceDialog : Dialog {
                         var msg = Message.obtain()
                         with(msg) {
                             what = 0
-                            obj = result
-                            handler.sendMessage(msg)
+                            obj = name
+                            if (result)
+                                arg1 = 1
+                            else
+                                arg1 = 0
                         }
+                        handler.sendMessage(msg)
                     })
 
                 }
