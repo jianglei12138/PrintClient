@@ -29,7 +29,7 @@ class TabAdapter : FragmentPagerAdapter {
     }
 
     override fun getItem(position: Int): Fragment {
-        return SubFragment.newInstance(title[position])
+        return SubFragment.newInstance(title[position],printer)
     }
 
     override fun getCount(): Int {

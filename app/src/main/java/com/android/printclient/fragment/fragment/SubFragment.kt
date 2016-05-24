@@ -13,31 +13,38 @@ import com.android.printclient.R
  */
 class SubFragment : Fragment() {
 
+    init {
+        System.loadLibrary("options")
+    }
 
-    var title: String? = null
 
     companion object {
-        val ARG_SELECTION_TITLE = "arg"
-        fun newInstance(title: String): SubFragment {
+        val ARG_SELECTION_TITLE = "title"
+        val ARG_SELECTION_NAME = "name"
+        fun newInstance(title: String, printer: String): SubFragment {
             val fragment = SubFragment()
             val args = Bundle()
             args.putString(ARG_SELECTION_TITLE, title)
+            args.putString(ARG_SELECTION_NAME, printer)
             fragment.arguments = args
             return fragment
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        title = arguments.getString("title")
-    }
-
+    external fun getGroup(group: String, printer: String): List<String>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater!!.inflate(R.layout.fragment_sub, container, false)
 
+        val title = arguments.getString(ARG_SELECTION_TITLE)
+        val name = arguments.getString(ARG_SELECTION_NAME)
+
+        var options = getGroup(title, name);
         var txt = view.findViewById(R.id.textView) as TextView
-        txt.text = "title"
+
+        options.forEach {
+            txt.append(it)
+        }
 
         return view
     }
