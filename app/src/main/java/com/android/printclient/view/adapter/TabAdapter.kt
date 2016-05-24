@@ -1,32 +1,45 @@
 package com.android.printclient.view.adapter
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.app.FragmentStatePagerAdapter
+import android.util.Log
+import com.android.printclient.fragment.fragment.SubFragment
+import com.android.printclient.utility.TabDict
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/23.
  */
 class TabAdapter : FragmentPagerAdapter {
 
-    var mfragments: List<Fragment>
     var title: List<String>
+    var printer: String
+    var context: Context
 
-    constructor(manager: FragmentManager, fragments: List<Fragment>, title: List<String>) : super(manager) {
-        this.mfragments = fragments
+    var dictionary: HashMap<String, String>
+
+
+    constructor(manager: FragmentManager, title: List<String>, printer: String, context: Context) : super(manager) {
         this.title = title
+        this.printer = printer
+        this.context = context
+        dictionary = TabDict(context).dictionary
     }
 
     override fun getItem(position: Int): Fragment {
-        return mfragments[position]
+        return SubFragment.newInstance(title[position])
     }
 
     override fun getCount(): Int {
-        return mfragments.size
+        return title.size
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        return title[position]
+        var language = dictionary[title[position]]
+        if (language == null) language = title[position]
+        Log.d("Adapter",language)
+        return language
     }
 }

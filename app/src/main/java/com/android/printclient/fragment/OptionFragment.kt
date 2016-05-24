@@ -9,8 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.android.printclient.MainActivity
 import com.android.printclient.R
-import com.android.printclient.fragment.fragment.SubFragment
-import com.android.printclient.utility.TabDict
 import com.android.printclient.view.adapter.TabAdapter
 import java.util.*
 
@@ -27,7 +25,6 @@ class OptionFragment : Fragment() {
 
     var printer: String? = null
 
-    var dictionary: HashMap<String, String>? = null
 
     var tabs: TabLayout? = null
 
@@ -49,31 +46,14 @@ class OptionFragment : Fragment() {
         }
 
         var list = getOptionGroups(printer!!)
-        var fragments = ArrayList<SubFragment>()
 
-        var viewPager = view.findViewById(R.id.viewPager) as ViewPager
+        val adapter = TabAdapter(childFragmentManager, list, printer!!, context)
 
-        dictionary = TabDict(context).dictionary
+        val mViewPager = view.findViewById(R.id.viewPager) as ViewPager
+        mViewPager.adapter = adapter
 
         tabs!!.tabMode = TabLayout.MODE_SCROLLABLE
-        list.forEach {
-            //it may not the suitable language
-            var language = dictionary!![it.toUpperCase().replace(" ", "")]
-            if (language == null) language = it
-            tabs!!.addTab(tabs!!.newTab().setText(language))
-            var fragment = SubFragment()
-            var bundle = Bundle()
-            bundle.putString("title", language)
-            fragment.arguments = bundle
-            fragments.add(fragment)
-        }
-
-        var adapter = TabAdapter(childFragmentManager, fragments, list)
-
-        viewPager.adapter = adapter
-        tabs!!.setupWithViewPager(viewPager)
-
-
+        tabs!!.setupWithViewPager(mViewPager)
         return view
     }
 

@@ -1,8 +1,6 @@
 package com.android.printclient
 
 import android.Manifest
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -15,7 +13,6 @@ import com.android.printclient.data.PpdDB
 import com.android.printclient.dialog.DeviceDialog
 import com.android.printclient.fragment.AddFragment
 import com.android.printclient.fragment.MainFragment
-import com.android.printclient.fragment.OptionFragment
 import com.android.printclient.utility.Permission
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.async
@@ -32,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     var mainFragment: MainFragment = MainFragment()
     var addFragment: AddFragment = AddFragment()
-    var optionFragment: OptionFragment = OptionFragment()
 
     var ppdReceiver = DeviceDialog.ResultPPDFile()
 
@@ -52,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             //add fragment
             supportFragmentManager
                     .beginTransaction()
-                    .add(container_CoordinatorLayout.id, MainFragment())
+                    .add(container_CoordinatorLayout.id, mainFragment)
                     .commit()
         }
         search_ActionButton.setOnClickListener() {
@@ -67,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                         .beginTransaction()
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .addToBackStack("add") //for back key
-                        .replace(container_CoordinatorLayout.id, AddFragment())
+                        .replace(container_CoordinatorLayout.id, addFragment)
                         .commit()
                 //hide fab
                 search_ActionButton.visibility = View.GONE
@@ -100,11 +96,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (!addFragment.isHidden)
+        if (!mainFragment.isVisible && addFragment.isVisible)
             search_ActionButton.visibility = View.VISIBLE
-            tabs.visibility = View.GONE
+        else
+            search_ActionButton.visibility = View.GONE
+        tabs.visibility = View.GONE
         super.onBackPressed()
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK && requestCode == FILE_SELECT_CODE && data != null) {
@@ -128,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                     .beginTransaction()
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .addToBackStack("add") //for back key
-                    .replace(container_CoordinatorLayout.id, AddFragment())
+                    .replace(container_CoordinatorLayout.id, addFragment)
                     .commitAllowingStateLoss()
             //hide fab
             search_ActionButton.visibility = View.GONE
@@ -139,10 +138,5 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    class FragmentToggle : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            var printer = intent!!.getStringExtra("printer")
-        }
-    }
 }
 
