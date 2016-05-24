@@ -37,9 +37,8 @@ class TabAdapter : FragmentPagerAdapter {
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        var language = dictionary[title[position]]
+        var language = dictionary[title[position].toUpperCase().replace(" ","")]
         if (language == null) language = title[position]
-        Log.d("Adapter",language)
         return language
     }
 }
