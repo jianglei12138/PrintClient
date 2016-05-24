@@ -128,7 +128,10 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     ppd_group_t *group;     /*groups          */
     ppd_option_t *option;   /*option          */
     ppd_choice_t *choice;   /*option choice   */
-    //ppd_size_t *size;       /* Size record    */
+    ipp_attribute_t *attr;  /* response attr  */
+    ipp_t *request;         /* IPP request    */
+    ipp_t *response;        /* IPP response   */
+    char uri[1024];
 
     //init
     groupname = (*env)->GetStringUTFChars(env, groupString, 0);
@@ -152,6 +155,14 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     //if (ppd == NULL) return NULL;
 
 
+    request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
+
+    httpAssembleURIf(HTTP_URI_CODING_ALL, uri, sizeof(uri), "ipp", NULL,
+                     "localhost", ippPort(), "/printers/%s", printer);
+    ippAddString(request, IPP_TAG_OPERATION, IPP_TAG_URI, "printer-uri",
+                 NULL, uri);
+
+    response = cupsDoRequest(http, request, "/");
 
     //List<Option> ----> Result
     jclass optionListClass = (*env)->FindClass(env, "java/util/ArrayList");
@@ -205,7 +216,172 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     jfieldID itemChoice = (*env)->GetFieldID(env, itemClass, "choice", "Ljava/lang/String;");
     jfieldID itemText = (*env)->GetFieldID(env, itemClass, "text", "Ljava/lang/String;");
 
+    /*   banners   */
+    if (strcasecmp(groupname, "Banners") == 0) if (
+            (attr = ippFindAttribute(response, "job-sheets-supported",
+                                     IPP_TAG_ZERO)) != NULL) {
 
+        jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        //set
+        (*env)->SetObjectField(env, optionInstance, optionKey,
+                               (*env)->NewStringUTF(env, "job_sheets_start"));
+        (*env)->SetObjectField(env, optionInstance, optionText,
+                               (*env)->NewStringUTF(env, cgiText("Starting Banner")));
+        jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
+                                                     "");
+        int k;
+        for (k = 0; k < ippGetCount(attr); k++) {
+            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            (*env)->SetObjectField(env, itemInstance, itemChoice,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
+            (*env)->SetObjectField(env, itemInstance, itemText,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
+            (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
+                                      itemInstance);
+
+        }
+        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+        (*env)->SetObjectField(env, optionInstance, optionChoice,
+                               (*env)->NewStringUTF(env, attr != NULL ? ippGetString(attr, 0, NULL)
+                                                                      : ""));
+        (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+
+
+        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+
+        jobject optionInstance2 = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        //set
+        (*env)->SetObjectField(env, optionInstance2, optionKey,
+                               (*env)->NewStringUTF(env, "job_sheets_end"));
+        (*env)->SetObjectField(env, optionInstance2, optionText,
+                               (*env)->NewStringUTF(env, cgiText("Ending Banner")));
+        jobject itemListInstance2 = (*env)->NewObject(env, itemListClass, itemListConstruction,
+                                                      "");
+        int j;
+        for (j = 0; j < ippGetCount(attr); j++) {
+            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            (*env)->SetObjectField(env, itemInstance, itemChoice,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
+            (*env)->SetObjectField(env, itemInstance, itemText,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
+            (*env)->CallBooleanMethod(env, itemListInstance2, itemListAddFun,
+                                      itemInstance);
+
+        }
+        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+        (*env)->SetObjectField(env, optionInstance2, optionChoice,
+                               (*env)->NewStringUTF(env, attr != NULL && ippGetCount(attr) > 1
+                                                         ? ippGetString(attr, 1, NULL) : ""));
+        (*env)->SetObjectField(env, optionInstance2, optionItems, itemListInstance2);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance2);
+        return optionListInstance;
+    }
+    /*   policy   */
+    if (strcasecmp(groupname, "Policies") == 0) if (
+            ippFindAttribute(response, "printer-error-policy-supported",
+                             IPP_TAG_ZERO) ||
+            ippFindAttribute(response, "printer-op-policy-supported",
+                             IPP_TAG_ZERO)) {
+
+
+        attr = ippFindAttribute(response, "printer-error-policy-supported",
+                                IPP_TAG_ZERO);
+        if (attr) {
+            jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+            //set
+            (*env)->SetObjectField(env, optionInstance, optionKey,
+                                   (*env)->NewStringUTF(env, "printer_error_policy"));
+            (*env)->SetObjectField(env, optionInstance, optionText,
+                                   (*env)->NewStringUTF(env, cgiText("Error Policy")));
+            jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
+                                                         "");
+            int k;
+            for (k = 0; k < ippGetCount(attr); k++) {
+                jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+                (*env)->SetObjectField(env, itemInstance, itemChoice,
+                                       (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
+                (*env)->SetObjectField(env, itemInstance, itemText,
+                                       (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
+                (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
+                                          itemInstance);
+
+            }
+            attr = ippFindAttribute(response, "printer-error-policy", IPP_TAG_ZERO);
+            (*env)->SetObjectField(env, optionInstance, optionChoice,
+                                   (*env)->NewStringUTF(env,
+                                                        attr == NULL ? "" : ippGetString(attr, 0,
+                                                                                         NULL)));
+            (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
+            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+        }
+
+        attr = ippFindAttribute(response, "printer-op-policy-supported",
+                                IPP_TAG_ZERO);
+        if (attr) {
+            jobject optionInstance2 = (*env)->NewObject(env, optionClass, optionConstruction, "");
+            //set
+            (*env)->SetObjectField(env, optionInstance2, optionKey,
+                                   (*env)->NewStringUTF(env, "printer_op_policy"));
+            (*env)->SetObjectField(env, optionInstance2, optionText,
+                                   (*env)->NewStringUTF(env, cgiText("Operation Policy")));
+            jobject itemListInstance2 = (*env)->NewObject(env, itemListClass, itemListConstruction,
+                                                          "");
+            int j;
+            for (j = 0; j < ippGetCount(attr); j++) {
+                jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+                (*env)->SetObjectField(env, itemInstance, itemChoice,
+                                       (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
+                (*env)->SetObjectField(env, itemInstance, itemText,
+                                       (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
+                (*env)->CallBooleanMethod(env, itemListInstance2, itemListAddFun,
+                                          itemInstance);
+            }
+            attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
+            (*env)->SetObjectField(env, optionInstance2, optionChoice,
+                                   (*env)->NewStringUTF(env, attr == NULL ?
+                                                             "" : ippGetString(attr, 0, NULL)));
+            (*env)->SetObjectField(env, optionInstance2, optionItems, itemListInstance2);
+            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance2);
+        }
+        return optionListInstance;
+    }
+
+    /*   monitor   */
+
+    if (strcasecmp(groupname, "Port Monitor") == 0) if (
+            (attr = ippFindAttribute(response, "port-monitor-supported",
+                                     IPP_TAG_NAME)) != NULL && ippGetCount(attr) > 1) {
+        jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        //set
+        (*env)->SetObjectField(env, optionInstance, optionKey,
+                               (*env)->NewStringUTF(env, "port_monitor"));
+        (*env)->SetObjectField(env, optionInstance, optionText,
+                               (*env)->NewStringUTF(env, cgiText("Port Monitor")));
+        jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
+                                                     "");
+
+        int i;
+        for (i = 0; i < ippGetCount(attr); i++) {
+            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            (*env)->SetObjectField(env, itemInstance, itemChoice,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, i, NULL)));
+            (*env)->SetObjectField(env, itemInstance, itemText,
+                                   (*env)->NewStringUTF(env, ippGetString(attr, i, NULL)));
+            (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
+                                      itemInstance);
+        }
+
+        attr = ippFindAttribute(response, "port-monitor", IPP_TAG_NAME);
+        (*env)->SetObjectField(env, optionInstance, optionChoice,
+                               (*env)->NewStringUTF(env,
+                                                    attr ? ippGetString(attr, 0, NULL) : "none"));
+        (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+        return optionListInstance;
+    }
+
+    /*   for group in ppd files  */
     for (i = 0, group = ppd->groups; i < ppd->num_groups; ++i, group++) {
         if (strcasecmp(group->text, groupname)) {
             continue;
@@ -223,7 +399,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                                    (*env)->NewStringUTF(env, uis[option->ui]));
             (*env)->SetObjectField(env, optionInstance, optionSection,
                                    (*env)->NewStringUTF(env, sections[option->section]));
-            (*env)->SetIntField(env, optionInstance, optionOrder, option->order);
+            (*env)->SetIntField(env, optionInstance, optionOrder, (jint) option->order);
 
 
             jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,

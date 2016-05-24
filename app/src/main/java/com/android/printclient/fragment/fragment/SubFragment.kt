@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.android.printclient.R
+import com.android.printclient.objects.Option
 
 /**
  * Created by jianglei on 16/5/23.
@@ -31,7 +32,7 @@ class SubFragment : Fragment() {
         }
     }
 
-    external fun getGroup(group: String, printer: String): List<String>
+    external fun getGroup(group: String, printer: String): List<Option>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = inflater!!.inflate(R.layout.fragment_sub, container, false)
@@ -41,9 +42,10 @@ class SubFragment : Fragment() {
 
         var options = getGroup(title, name);
         var txt = view.findViewById(R.id.textView) as TextView
+        txt.text = title+  ""
 
         options.forEach {
-            txt.append(it)
+            txt.append(it.text+"---->")
         }
 
         return view
