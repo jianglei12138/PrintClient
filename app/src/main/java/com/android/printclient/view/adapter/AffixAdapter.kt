@@ -37,7 +37,7 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        var data: Any = mDataset.get(position)
+        val data: Any = mDataset[position]
         if (holder is PrinterTitleHolder) {
             holder.title.text = data.toString()
         } else if (holder is PrinterTextHolder) {
@@ -50,12 +50,12 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
         when (viewType) {
             TYPE_TITLE -> {
-                var view: View = LayoutInflater.from(context).inflate(R.layout.recycler_itemtitle, parent, false)
+                val view: View = LayoutInflater.from(context).inflate(R.layout.recycler_itemtitle, parent, false)
                 return PrinterTitleHolder(view)
             }
 
             TYPE_TEXT -> {
-                var view: View = LayoutInflater.from(context).inflate(R.layout.recycler_itemtext, parent, false)
+                val view: View = LayoutInflater.from(context).inflate(R.layout.recycler_itemtext, parent, false)
                 return PrinterTextHolder(view)
             }
 
@@ -65,7 +65,7 @@ class AffixAdapter : RecyclerView.Adapter<AffixAdapter.ViewHolder> {
 
     override fun getItemViewType(position: Int): Int {
 
-        when (mDataset.get(position)) {
+        when (mDataset[position]) {
             context.getString(R.string.local_printer) -> return TYPE_TITLE
             context.getString(R.string.network_printer) -> return TYPE_TITLE
             context.getString(R.string.other_printer) -> return TYPE_TITLE

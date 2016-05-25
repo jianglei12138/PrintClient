@@ -70,5 +70,6 @@
     <string name="port_monitor">端口监视器</string>
     <string name="options_installed">选项已安装</string>
     <string name="jcl">作业控制语言</string>
+    <string name="option_TextView">没有合适的选项</string>
 
 </resources>

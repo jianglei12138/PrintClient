@@ -2,12 +2,19 @@ package com.android.printclient.fragment.fragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.android.printclient.R
+import com.android.printclient.objects.Item
 import com.android.printclient.objects.Option
+import com.android.printclient.view.adapter.OptionAdapter
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/23.
@@ -41,12 +48,38 @@ class SubFragment : Fragment() {
         val name = arguments.getString(ARG_SELECTION_NAME)
 
         var options = getGroup(title, name);
-        var txt = view.findViewById(R.id.textView) as TextView
-        txt.text = title+  ""
 
-        options.forEach {
-            txt.append(it.text+"---->")
+        var recyleView = view.findViewById(R.id.sub_recyclerView) as RecyclerView
+
+
+        Log.d("options", " =====>  " + options.size)
+
+        recyleView.setHasFixedSize(true)
+        recyleView.layoutManager = LinearLayoutManager(context)
+        //recyleView.emptyView = view.findViewById(R.id.empty_LinearLayout)
+        recyleView.itemAnimator = DefaultItemAnimator()
+        var optionAdapter = OptionAdapter(options, context)
+        optionAdapter.onItemOrBoxClicked = object : OptionAdapter.OnItemOrBoxClicked {
+            override fun onItemClick(items: String?, options: List<Item>, choice: String) {
+                var itemsText = ArrayList<String>()
+                var itemsChoice = ArrayList<String>()
+                options.forEach {
+                    itemsText.add(it.text!!)
+                    itemsChoice.add(it.choice!!)
+                }
+                var index = itemsChoice.indexOf(choice)
+                AlertDialog.Builder(context)
+                        .setMessage("选项")
+                        .setSingleChoiceItems(itemsText.toTypedArray(), index, { v, which ->  })
+                        .setPositiveButton("确定", null)
+                        .show()
+            }
+
+            override fun onClickBox(key: String?, select: Boolean) {
+            }
+
         }
+        recyleView.adapter = optionAdapter
 
         return view
     }
