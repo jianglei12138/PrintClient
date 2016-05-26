@@ -34,7 +34,7 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
     }
 
     interface OnItemOrBoxClicked {
-        fun onItemClick(items: String?, options: List<Item>, choice: String);
+        fun onItemClick(option: String?);
         fun onClickBox(key: String?, select: Boolean);
     }
 
@@ -46,7 +46,6 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
     constructor(options: List<Option>, context: Context) {
         this.options = options
         this.context = context
-        Log.d("TAG", "i have arried here")
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -61,7 +60,6 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
 
 
     override fun getItemCount(): Int {
-        Log.d("adapter", "size = " + options.size)
         return options.size
     }
 
@@ -69,16 +67,17 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
         var option = options[position]
         if (holder is BooleanHolder) {
             holder.itemText.text = option.text
+            holder.itemText.tag = option.key
             holder.itemCheckBox.isSelected = option.choice!!.toUpperCase().equals("TRUE")
-            //holder.itemCheckBox.setOnCheckedChangeListener { v, select -> onItemOrBoxClicked!!.onClickBox(option.key, select) }
+            holder.itemCheckBox.setOnCheckedChangeListener { v, select -> onItemOrBoxClicked!!.onClickBox(option.key, select) }
         } else if (holder is OneHolder) {
             holder.itemText.text = option.text
             holder.itemHint.text = option.choice
-            //holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key, option.items,option.choice!!) }
+            holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key) }
         } else if (holder is ManyHolder) {
             holder.itemText.text = option.text
             holder.itemHint.text = option.choice
-            //holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key, option.items,option.choice!!) }
+            holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key) }
         }
     }
 
@@ -112,38 +111,30 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
         init {
             itemCheckBox = v.findViewById(R.id.item_checkBox) as CheckBox
             itemText = v.findViewById(R.id.item_textView) as TextView
-
-            var option = options.filter { it.text!!.equals(itemText.text) }[0]
-
-            itemCheckBox.setOnCheckedChangeListener { v, select -> onItemOrBoxClicked!!.onClickBox(option.key, select) }
         }
     }
 
     inner class OneHolder(v: View) : AbsViewHolder (v) {
         var itemText: TextView
         var itemHint: TextView
+        var view:View
 
         init {
             itemHint = v.findViewById(R.id.item_hint) as TextView
             itemText = v.findViewById(R.id.item_textView) as TextView
-
-            var option = options.filter { it.text!!.equals(itemText.text) }[0]
-
-            v.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key, option.items,option.choice!!) }
+            view = v
         }
     }
 
     inner class ManyHolder(v: View) : AbsViewHolder(v) {
         var itemText: TextView
         var itemHint: TextView
+        var view:View
 
         init {
             itemHint = v.findViewById(R.id.item_hint) as TextView
             itemText = v.findViewById(R.id.item_textView) as TextView
-
-            var option = options.filter { it.text!!.equals(itemText.text) }[0]
-
-            v.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key, option.items,option.choice!!) }
+            view = v
         }
     }
 

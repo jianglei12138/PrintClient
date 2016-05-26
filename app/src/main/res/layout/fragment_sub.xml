@@ -8,28 +8,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/empty_LinearLayout"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:orientation="vertical">-->
+    <LinearLayout
+        android:id="@+id/empty_LinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
 
-        <!--<ImageView-->
-            <!--android:layout_width="156dp"-->
-            <!--android:layout_height="156dp"-->
-            <!--android:src="@drawable/ic_options" />-->
+        <ImageView
+            android:layout_width="156dp"
+            android:layout_height="156dp"
+            android:src="@drawable/ic_options" />
 
-        <!--<Space-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="10dp" />-->
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="10dp" />
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:text="@string/option_TextView"-->
-            <!--android:textColor="@color/colorEmptyText" />-->
-    <!--</LinearLayout>-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/option_TextView"
+            android:textColor="@color/colorEmptyText" />
+    </LinearLayout>
 </RelativeLayout>
