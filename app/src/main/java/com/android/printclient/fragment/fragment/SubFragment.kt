@@ -59,7 +59,6 @@ class SubFragment : Fragment() {
 
         recyleView.setHasFixedSize(true)
         recyleView.layoutManager = LinearLayoutManager(context)
-        //recyleView.emptyView = view.findViewById(R.id.empty_LinearLayout)
         recyleView.itemAnimator = DefaultItemAnimator()
         var optionAdapter = OptionAdapter(options, context)
         optionAdapter.onItemOrBoxClicked = object : OptionAdapter.OnItemOrBoxClicked {

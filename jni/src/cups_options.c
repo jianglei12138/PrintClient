@@ -240,7 +240,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                                       itemInstance);
 
         }
-        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+        attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO);
         (*env)->SetObjectField(env, optionInstance, optionChoice,
                                (*env)->NewStringUTF(env, attr != NULL ? ippGetString(attr, 0, NULL)
                                                                       : ""));
@@ -248,7 +248,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
         (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
 
 
-        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+        attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO);
 
         jobject optionInstance2 = (*env)->NewObject(env, optionClass, optionConstruction, "");
         //set
@@ -410,7 +410,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                 for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
                     if (strcmp(option->defchoice, choice->choice) == 0)
                         (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->choice));
+                                               (*env)->NewStringUTF(env, choice->text));
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
                     (*env)->SetObjectField(env, itemInstance, itemChoice,
@@ -425,7 +425,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                 for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
                     if (strcmp(option->defchoice, choice->choice) == 0)
                         (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->choice));
+                                               (*env)->NewStringUTF(env, choice->text));
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
                     (*env)->SetObjectField(env, itemInstance, itemChoice,
