@@ -158,9 +158,16 @@ class DeviceDialog : Dialog {
 
             if (tabhost!!.currentTab == tabTitle.size - 1) {
                 if (makeSpinner!!.selectedItemPosition != 0 && modelSpinner!!.selectedItemPosition != 0) {
+
                     var make = makeSpinner!!.selectedItem as String
                     var model = modelSpinner!!.selectedItem as String
-                    var ppdname = getServerPpd(db.getNameByMakeAndModel(make, model))
+                    var ppdname: String = ""
+                    var type: Int = 0
+                    if (model.toLowerCase().equals("raw")) {
+                        type = 1;
+                        ppdname = "raw" //no use, just as a flag
+                    } else
+                        ppdname = getServerPpd(db.getNameByMakeAndModel(make, model))
                     if (!!TextUtils.isEmpty(ppdname)) {
                         Snackbar.make(view, context.getString(R.string.ppd_error), Snackbar.LENGTH_LONG).show()
                     } else {
@@ -175,7 +182,7 @@ class DeviceDialog : Dialog {
 
                         //do add printer
                         ThreadUtil.execute(Runnable {
-                            var result = addPrinter(0, ppdname, name, uri, isShared, location, info);
+                            var result = addPrinter(type, ppdname, name, uri, isShared, location, info);
                             var msg = Message.obtain()
                             with(msg) {
                                 what = 0
@@ -279,7 +286,13 @@ class DeviceDialog : Dialog {
                     modelSpinner!!.adapter = adapterModel
                     return
                 }
-                val itemModelByMake = db.getModelByMake(itemMake[position])
+
+                var itemModelByMake = ArrayList<String>()
+                if (itemMake[position].toLowerCase().equals("raw")) {
+                    itemModelByMake.add("raw")
+                } else {
+                    itemModelByMake = db.getModelByMake(itemMake[position])
+                }
                 itemModelByMake.add(0, context.getString(R.string.printer_model))
                 val adapterModelByMake = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemModelByMake.toTypedArray())
                 modelSpinner!!.adapter = adapterModelByMake
