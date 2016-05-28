@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import com.android.printclient.R
 import com.android.printclient.objects.Option
 import com.android.printclient.view.adapter.OptionAdapter
+import java.util.*
 
 /**
  * Created by jianglei on 16/5/23.
@@ -49,7 +50,8 @@ class SubFragment : Fragment() {
         var recyleView = view.findViewById(R.id.sub_recyclerView) as RecyclerView
         var emptyView = view.findViewById(R.id.empty_LinearLayout)
 
-        if (options.size < 1) {
+        if (options == null || options.size < 1) {
+            options = ArrayList<Option>()
             emptyView.visibility = View.VISIBLE
             recyleView.visibility = View.GONE
         } else {
