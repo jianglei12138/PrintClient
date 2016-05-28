@@ -380,10 +380,12 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     }
 
     /*   for group in ppd files  */
+    int found_pagesize = 0 ;
     for (i = 0, group = ppd->groups; i < ppd->num_groups; ++i, group++) {
         if (strcasecmp(group->text, groupname)) {
             continue;
         }
+
         for (j = 0, option = group->options; j < group->num_options; ++j, option++) {
 
             jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
@@ -404,11 +406,15 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                                                          "");
 
             if (strcmp(option->keyword, "PageSize") == 0 ||
-                strcmp(option->keyword, "PageRegion") == 0) {
+                strcmp(option->keyword, "PageRegion") == 0 ||
+				strcmp(option->keyword, "PaperDimension") == 0 ||
+				strcmp(option->keyword, "ImageableArea") == 0) {
+            	if(found_pagesize != 0) continue;
+            	found_pagesize = 1;
                 for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
                     if (strcmp(option->defchoice, choice->choice) == 0)
                         (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->text));
+                                               (*env)->NewStringUTF(env, choice->choice));
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
                     (*env)->SetObjectField(env, itemInstance, itemChoice,
@@ -423,7 +429,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                 for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
                     if (strcmp(option->defchoice, choice->choice) == 0)
                         (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->text));
+                                               (*env)->NewStringUTF(env, choice->choice));
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
                     (*env)->SetObjectField(env, itemInstance, itemChoice,

@@ -2,14 +2,12 @@ package com.android.printclient.view.adapter
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import com.android.printclient.R
-import com.android.printclient.objects.Item
 import com.android.printclient.objects.Option
 import java.util.*
 
@@ -72,11 +70,17 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
             holder.itemCheckBox.setOnCheckedChangeListener { v, select -> onItemOrBoxClicked!!.onClickBox(option.key, select) }
         } else if (holder is OneHolder) {
             holder.itemText.text = option.text
-            holder.itemHint.text = option.choice
+            var options = option.items.filter { it.choice.equals(option.choice) }
+            if(options.size == 1){
+                holder.itemHint.text = options[0].text
+            }
             holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key) }
         } else if (holder is ManyHolder) {
             holder.itemText.text = option.text
-            holder.itemHint.text = option.choice
+            var options = option.items.filter { it.choice.equals(option.choice) }
+            if(options.size == 1){
+                holder.itemHint.text = options[0].text
+            }
             holder.view.setOnClickListener { v -> onItemOrBoxClicked!!.onItemClick(option.key) }
         }
     }
@@ -117,7 +121,7 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
     inner class OneHolder(v: View) : AbsViewHolder (v) {
         var itemText: TextView
         var itemHint: TextView
-        var view:View
+        var view: View
 
         init {
             itemHint = v.findViewById(R.id.item_hint) as TextView
@@ -129,7 +133,7 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
     inner class ManyHolder(v: View) : AbsViewHolder(v) {
         var itemText: TextView
         var itemHint: TextView
-        var view:View
+        var view: View
 
         init {
             itemHint = v.findViewById(R.id.item_hint) as TextView
