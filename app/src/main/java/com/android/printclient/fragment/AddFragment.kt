@@ -53,6 +53,8 @@ class AddFragment : Fragment() {
             act.title = getString(R.string.add_printers)
         }
 
+        data.clear()
+
         var waysRecyclerView = view?.findViewById(R.id.ways_RecyclerView) as RecyclerView
         waysRecyclerView.setHasFixedSize(true)
         waysRecyclerView.layoutManager = LinearLayoutManager(activity)
@@ -105,6 +107,7 @@ class AddFragment : Fragment() {
 
         return view
     }
+
 
 
     override fun onDestroy() {
