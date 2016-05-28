@@ -22,6 +22,7 @@ class OptionFragment : Fragment() {
     }
 
     external fun getOptionGroups(name: String): ArrayList<String>
+    external fun release()
 
     var printer: String? = null
 
@@ -57,4 +58,9 @@ class OptionFragment : Fragment() {
         return view
     }
 
+
+//    override fun onDestroy() {
+//        release()
+//        super.onDestroy()
+//    }
 }

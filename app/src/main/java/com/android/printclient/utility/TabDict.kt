@@ -19,6 +19,7 @@ class TabDict(context: Context) {
         dictionary.put("PORTMONITOR",context.getString(R.string.port_monitor));
         dictionary.put("JCL",context.getString(R.string.jcl))
         dictionary.put("OPTIONSINSTALLED",context.getString(R.string.options_installed))
+        dictionary.put("INSTALLABLEOPTIONS",context.getString(R.string.options_installed))
         dictionary.put("PRINTERSETTINGS",context.getString(R.string.printer_settings))
     }
 }

@@ -9,6 +9,9 @@
 #include "cups_util.h"
 #include "android/log.h"
 
+static jobject options_instance;
+//static jmethodID options_add;
+
 JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_getOptionGroups
         (JNIEnv *env, jobject jthis, jstring name) {
 
@@ -19,7 +22,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
                                                  "()V");
     if (options_init == NULL)
         return NULL;
-    jobject options_instance = (*env)->NewObject(env, options, options_init, "");
+    options_instance = (*env)->NewGlobalRef(env,(*env)->NewObject(env, options, options_init, ""));
     jmethodID options_add = (*env)->GetMethodID(env, options, "add",
                                                 "(Ljava/lang/Object;)Z");
 
@@ -53,20 +56,10 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     i = 0;
     if (ppd) {
         for (group = ppd->groups; i < ppd->num_groups; i++, group++) {
-            //cgiSetArray("GROUP_ID", i, group->name);
-            //printf("group_id = %s", group->name);
-            if (!strcmp(group->name, "InstallableOptions")) {
-                //cgiSetArray("GROUP", i, cgiText("Options Installed"));
-                printf("group = %s\n", cgiText("Options Installed"));
-                (*env)->CallBooleanMethod(env, options_instance, options_add,
-                                          cgiText("Options Installed"));
-            }
-            else {
                 //cgiSetArray("GROUP", i, group->text);
                 printf("group = %s\n", group->text);
                 (*env)->CallBooleanMethod(env, options_instance, options_add,
                                           (*env)->NewStringUTF(env, group->text));
-            }
         }
     }
 
@@ -101,6 +94,11 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     return options_instance;
 }
 
+JNIEXPORT void JNICALL Java_com_android_printclient_fragment_OptionFragment_realease
+        (JNIEnv *env, jobject jthis) {
+    (*env)->DeleteGlobalRef(env,options_instance);
+    //(*env)->DeleteGlobalRef(env,options_add);
+}
 
 char *getServerPpd(const char *name) {
     setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
@@ -443,6 +441,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     }
     return optionListInstance;
 }
+
 
 
 
