@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.android.printclient.R
 import com.android.printclient.objects.Option
+import com.android.printclient.view.ItemDecoration
 import com.android.printclient.view.adapter.OptionAdapter
 import java.util.*
 
@@ -63,24 +64,19 @@ class SubFragment : Fragment() {
         recyleView.layoutManager = LinearLayoutManager(context)
         recyleView.itemAnimator = DefaultItemAnimator()
         var optionAdapter = OptionAdapter(options, context)
+        recyleView.addItemDecoration(ItemDecoration(context, LinearLayoutManager.VERTICAL))
         optionAdapter.onItemOrBoxClicked = object : OptionAdapter.OnItemOrBoxClicked {
             override fun onItemClick(option: String?) {
-
                 var choice = options.filter { it.key!!.equals(option) }
-
                 if (choice.size != 1) return
-
                 var items = choice[0].items
-
                 var itemsText: Array<String?> = arrayOfNulls(items.size);
-
                 var index = 0 ;
                 for (i in items.indices) {
                     itemsText[i] = items[i].text
                     if (items[i].choice.equals(choice[0].choice))
                         index = i;
                 }
-
                 AlertDialog.Builder(context)
                         .setTitle("选项")
                         .setSingleChoiceItems(itemsText, index, null)
