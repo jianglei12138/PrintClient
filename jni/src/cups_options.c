@@ -12,23 +12,30 @@
 static jobject options_instance;
 //static jmethodID options_add;
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_getOptionGroups
-        (JNIEnv *env, jobject jthis, jstring name) {
+
+char *getServerPpd(const char *name) {
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    http_t *http_t = gethttp_t();
+    char *ppdfile = (char *) cupsGetPPD2(http_t, name);
+    return ppdfile;
+}
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_getOptionGroups(
+        JNIEnv *env, jobject jthis, jstring name) {
 
     jclass options = (*env)->FindClass(env, "java/util/ArrayList");
     if (options == NULL)
         return NULL;
-    jmethodID options_init = (*env)->GetMethodID(env, options, "<init>",
-                                                 "()V");
+    jmethodID options_init = (*env)->GetMethodID(env, options, "<init>", "()V");
     if (options_init == NULL)
         return NULL;
-    options_instance = (*env)->NewGlobalRef(env,(*env)->NewObject(env, options, options_init, ""));
+    options_instance = (*env)->NewGlobalRef(env,
+                                            (*env)->NewObject(env, options, options_init, ""));
     jmethodID options_add = (*env)->GetMethodID(env, options, "add",
                                                 "(Ljava/lang/Object;)Z");
 
-
-    ipp_t *request;          /* IPP request */
-    ipp_t *response;         /* IPP response */
+    ipp_t *request; /* IPP request */
+    ipp_t *response; /* IPP response */
     char uri[1024];
     const char *printer = (*env)->GetStringUTFChars(env, name, NULL);
     http_t *http = gethttp_t();
@@ -43,7 +50,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     response = cupsDoRequest(http, request, "/");
 
     struct ppd_file_s *ppd = NULL;
-    ppd_group_t *group;            /* Option group */
+    ppd_group_t *group; /* Option group */
 
     int i;
     const char *filename = cupsGetPPD2(http, printer);
@@ -56,13 +63,12 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     i = 0;
     if (ppd) {
         for (group = ppd->groups; i < ppd->num_groups; i++, group++) {
-                //cgiSetArray("GROUP", i, group->text);
-                printf("group = %s\n", group->text);
-                (*env)->CallBooleanMethod(env, options_instance, options_add,
-                                          (*env)->NewStringUTF(env, group->text));
+            //cgiSetArray("GROUP", i, group->text);
+            printf("group = %s\n", group->text);
+            (*env)->CallBooleanMethod(env, options_instance, options_add,
+                                      (*env)->NewStringUTF(env, group->text));
         }
     }
-
 
     if (ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO)) {
         //cgiSetArray("GROUP_ID", i, "CUPS_BANNERS");
@@ -73,9 +79,9 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     }
 
     if (ippFindAttribute(response, "printer-error-policy-supported",
-                         IPP_TAG_ZERO) ||
-        ippFindAttribute(response, "printer-op-policy-supported",
-                         IPP_TAG_ZERO)) {
+                         IPP_TAG_ZERO)
+        || ippFindAttribute(response, "printer-op-policy-supported",
+                            IPP_TAG_ZERO)) {
         //cgiSetArray("GROUP_ID", i, "CUPS_POLICIES");
         printf("group = %s\n", cgiText(("Policies")));
         (*env)->CallBooleanMethod(env, options_instance, options_add,
@@ -94,64 +100,139 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
     return options_instance;
 }
 
-JNIEXPORT void JNICALL Java_com_android_printclient_fragment_OptionFragment_realease
-        (JNIEnv *env, jobject jthis) {
-    (*env)->DeleteGlobalRef(env,options_instance);
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_getConflictData(
+        JNIEnv *env, jobject jthis, jstring name) {
+
+    ppd_file_t *ppd;           /* PPD file record    */
+    ppd_group_t *group;        /* UI group           */
+    ppd_option_t *option;      /* Standard UI option */
+    const char *printer;       /* printer name       */
+    const char *filename;      /*ppd file and path   */
+
+    printer = (*env)->GetStringUTFChars(env, name, 0);
+
+    filename = getServerPpd(printer);
+
+    if ((ppd = ppdOpenFile(filename)) == NULL) {
+        __android_log_print(ANDROID_LOG_ERROR, "JNIEnv", "Unable to open \'%s\' as a PPD file!\n",
+                            filename);
+        return NULL;
+    }
+    ppdMarkDefaults(ppd);
+
+    //init java object
+    jclass conflicts = (*env)->FindClass(env, "java/util/ArrayList");
+    if (conflicts == NULL)
+        return NULL;
+    jmethodID conflicts_init = (*env)->GetMethodID(env, conflicts, "<init>", "()V");
+    if (conflicts_init == NULL)
+        return NULL;
+    jobject conflicts_instance = (*env)->NewObject(env, conflicts, conflicts_init, "");
+    jmethodID conflicts_add = (*env)->GetMethodID(env, conflicts, "add",
+                                                "(Ljava/lang/Object;)Z");
+
+    //conflict
+    jclass conflictClass = (*env)->FindClass(env, "com/android/printclient/objects/Conflict");
+    if (conflictClass == NULL)
+        return NULL;
+    jmethodID conflictConstruction = (*env)->GetMethodID(env, conflictClass,
+                                                         "<init>", "()V");
+    if (conflictConstruction == NULL)
+        return NULL;
+    jfieldID conflictKey = (*env)->GetFieldID(env, conflictClass, "key",
+                                              "Ljava/lang/String;");
+    jfieldID conflictText = (*env)->GetFieldID(env, conflictClass, "text",
+                                               "Ljava/lang/String;");
+    jfieldID conflictChoice = (*env)->GetFieldID(env, conflictClass, "choice",
+                                                 "Ljava/lang/String;");
+
+    int i, k, j, m;
+    if (ppdConflicts(ppd)) {
+        for (i = ppd->num_groups, k = 0, group = ppd->groups; i > 0; i--, group++)
+            for (j = group->num_options, option = group->options; j > 0; j--, option++)
+                if (option->conflicted) {
+                    jobject conflictInstance = (*env)->NewObject(env, conflictClass,
+                                                                 conflictConstruction, "");
+                    jstring tempKey = (*env)->NewStringUTF(env, option->keyword);
+                    (*env)->SetObjectField(env, conflictInstance, conflictKey, tempKey);
+                    (*env)->DeleteLocalRef(env, tempKey);
+
+                    jstring tempText = (*env)->NewStringUTF(env, option->text);
+                    (*env)->SetObjectField(env, conflictInstance, conflictText, tempText);
+                    (*env)->DeleteLocalRef(env, tempText);
+
+                    for (m = 0; m < option->num_choices; m++) {
+                        if (option->choices[m].marked) {
+                            jstring tempChoice = (*env)->NewStringUTF(env, option->choices[m].text);
+                            (*env)->SetObjectField(env, conflictInstance, conflictChoice,
+                                                   tempChoice);
+                            (*env)->DeleteLocalRef(env, tempChoice);
+                            break;
+                        }
+                    }
+                    (*env)->CallBooleanMethod(env,conflicts_instance,conflicts_add,conflictInstance);
+                    k++;
+                }
+    }
+    return conflicts_instance;
+}
+
+
+JNIEXPORT void JNICALL Java_com_android_printclient_fragment_OptionFragment_realease(
+        JNIEnv *env, jobject jthis) {
+    (*env)->DeleteGlobalRef(env, options_instance);
     //(*env)->DeleteGlobalRef(env,options_add);
 }
 
-char *getServerPpd(const char *name) {
-    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
-    http_t *http_t = gethttp_t();
-    char *ppdfile = (char *) cupsGetPPD2(http_t, name);
-    return ppdfile;
-}
 
-
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFragment_getGroup
-        (JNIEnv *env, jobject jthis, jstring groupString, jstring printerString) {
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFragment_getGroup(
+        JNIEnv *env, jobject jthis, jstring groupString, jstring printerString) {
 
     //set env
     //setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
     static char *uis[] = {"BOOLEAN", "PICKONE", "PICKMANY"};
-    static char *sections[] = {"ANY", "DOCUMENT", "EXIT",
-                               "JCL", "PAGE", "PROLOG"};
+    static char *sections[] = {"ANY", "DOCUMENT", "EXIT", "JCL", "PAGE",
+                               "PROLOG"};
 
-    char *filename;         /*ppd file path   */
-    http_t *http;           /*http connection */
-    const char *groupname;  /*group mame      */
-    const char *printer;    /*printer name    */
-    int i, j, m;            /*index of loop   */
-    ppd_file_t *ppd;        /*ppd file        */
-    ppd_group_t *group;     /*groups          */
-    ppd_option_t *option;   /*option          */
-    ppd_choice_t *choice;   /*option choice   */
-    ipp_attribute_t *attr;  /* response attr  */
-    ipp_t *request;         /* IPP request    */
-    ipp_t *response;        /* IPP response   */
+    char *filename; /*ppd file path   */
+    http_t *http; /*http connection */
+    const char *groupname; /*group mame      */
+    const char *printer; /*printer name    */
+    int i, j, m; /*index of loop   */
+    ppd_file_t *ppd; /*ppd file        */
+    ppd_group_t *group; /*groups          */
+    ppd_option_t *option; /*option          */
+    ppd_choice_t *choice; /*option choice   */
+    ipp_attribute_t *attr; /* response attr  */
+    ipp_t *request; /* IPP request    */
+    ipp_t *response; /* IPP response   */
     char uri[1024];
 
     //init
     groupname = (*env)->GetStringUTFChars(env, groupString, 0);
-    if (groupname == NULL) return NULL;
+    if (groupname == NULL)
+        return NULL;
 
-    __android_log_print(ANDROID_LOG_ERROR, "JNIEnv", "groupname = %s", groupname);
+    __android_log_print(ANDROID_LOG_ERROR, "JNIEnv", "groupname = %s",
+                        groupname);
 
     printer = (*env)->GetStringUTFChars(env, printerString, 0);
-    if (printer == NULL) return NULL;
+    if (printer == NULL)
+        return NULL;
 
     __android_log_print(ANDROID_LOG_ERROR, "JNIEnv", "printer = %s", printer);
 
-
     http = gethttp_t();
-    if (http == NULL) return NULL;
+    if (http == NULL)
+        return NULL;
 
     filename = getServerPpd(printer);
-    if (filename == NULL) return NULL;
+    if (filename == NULL)
+        return NULL;
 
     ppd = ppdOpenFile(filename);
     //if (ppd == NULL) return NULL;
-
 
     request = ippNewRequest(IPP_GET_PRINTER_ATTRIBUTES);
 
@@ -164,22 +245,28 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
 
     //List<Option> ----> Result
     jclass optionListClass = (*env)->FindClass(env, "java/util/ArrayList");
-    if (optionListClass == NULL) return NULL;
+    if (optionListClass == NULL)
+        return NULL;
 
-    jmethodID optionListConstrution = (*env)->GetMethodID(env, optionListClass, "<init>", "()V");
-    if (optionListConstrution == NULL) return NULL;
+    jmethodID optionListConstrution = (*env)->GetMethodID(env, optionListClass,
+                                                          "<init>", "()V");
+    if (optionListConstrution == NULL)
+        return NULL;
 
-    jobject optionListInstance = (*env)->NewObject(env, optionListClass, optionListConstrution, "");
-    jmethodID optionListAddFun = (*env)->GetMethodID(env, optionListClass, "add",
-                                                     "(Ljava/lang/Object;)Z");
-
-
+    jobject optionListInstance = (*env)->NewObject(env, optionListClass,
+                                                   optionListConstrution, "");
+    jmethodID optionListAddFun = (*env)->GetMethodID(env, optionListClass,
+                                                     "add", "(Ljava/lang/Object;)Z");
 
     //Option
-    jclass optionClass = (*env)->FindClass(env, "com/android/printclient/objects/Option");
-    if (optionClass == NULL) return NULL;
-    jmethodID optionConstruction = (*env)->GetMethodID(env, optionClass, "<init>", "()V");
-    if (optionConstruction == NULL)return NULL;
+    jclass optionClass = (*env)->FindClass(env,
+                                           "com/android/printclient/objects/Option");
+    if (optionClass == NULL)
+        return NULL;
+    jmethodID optionConstruction = (*env)->GetMethodID(env, optionClass,
+                                                       "<init>", "()V");
+    if (optionConstruction == NULL)
+        return NULL;
     jfieldID optionKey = (*env)->GetFieldID(env, optionClass, "key",
                                             "Ljava/lang/String;");
     jfieldID optionText = (*env)->GetFieldID(env, optionClass, "text",
@@ -194,42 +281,51 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     jfieldID optionItems = (*env)->GetFieldID(env, optionClass, "items",
                                               "Ljava/util/List;");
 
-
     //for item list
     jclass itemListClass = (*env)->FindClass(env, "java/util/ArrayList");
-    if (itemListClass == NULL) return NULL;
+    if (itemListClass == NULL)
+        return NULL;
 
-    jmethodID itemListConstruction = (*env)->GetMethodID(env, itemListClass, "<init>", "()V");
-    if (itemListConstruction == NULL) return NULL;
+    jmethodID itemListConstruction = (*env)->GetMethodID(env, itemListClass,
+                                                         "<init>", "()V");
+    if (itemListConstruction == NULL)
+        return NULL;
 
     jmethodID itemListAddFun = (*env)->GetMethodID(env, itemListClass, "add",
                                                    "(Ljava/lang/Object;)Z");
 
-
     //for item object
-    jclass itemClass = (*env)->FindClass(env, "com/android/printclient/objects/Item");
-    if (itemClass == NULL) return NULL;
-    jmethodID itemConstruction = (*env)->GetMethodID(env, itemClass, "<init>", "()V");
-    if (itemConstruction == NULL)return NULL;
-    jfieldID itemChoice = (*env)->GetFieldID(env, itemClass, "choice", "Ljava/lang/String;");
-    jfieldID itemText = (*env)->GetFieldID(env, itemClass, "text", "Ljava/lang/String;");
+    jclass itemClass = (*env)->FindClass(env,
+                                         "com/android/printclient/objects/Item");
+    if (itemClass == NULL)
+        return NULL;
+    jmethodID itemConstruction = (*env)->GetMethodID(env, itemClass, "<init>",
+                                                     "()V");
+    if (itemConstruction == NULL)
+        return NULL;
+    jfieldID itemChoice = (*env)->GetFieldID(env, itemClass, "choice",
+                                             "Ljava/lang/String;");
+    jfieldID itemText = (*env)->GetFieldID(env, itemClass, "text",
+                                           "Ljava/lang/String;");
 
     /*   banners   */
     if (strcasecmp(groupname, "Banners") == 0) if (
             (attr = ippFindAttribute(response, "job-sheets-supported",
                                      IPP_TAG_ZERO)) != NULL) {
 
-        jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        jobject optionInstance = (*env)->NewObject(env, optionClass,
+                                                   optionConstruction, "");
         //set
         (*env)->SetObjectField(env, optionInstance, optionKey,
                                (*env)->NewStringUTF(env, "job_sheets_start"));
         (*env)->SetObjectField(env, optionInstance, optionText,
                                (*env)->NewStringUTF(env, cgiText("Starting Banner")));
-        jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                     "");
+        jobject itemListInstance = (*env)->NewObject(env, itemListClass,
+                                                     itemListConstruction, "");
         int k;
         for (k = 0; k < ippGetCount(attr); k++) {
-            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            jobject itemInstance = (*env)->NewObject(env, itemClass,
+                                                     itemConstruction, "");
             (*env)->SetObjectField(env, itemInstance, itemChoice,
                                    (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
             (*env)->SetObjectField(env, itemInstance, itemText,
@@ -238,109 +334,133 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
                                       itemInstance);
 
         }
-        attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO);
+        attr = ippFindAttribute(response, "job-sheets-supported",
+                                IPP_TAG_ZERO);
         (*env)->SetObjectField(env, optionInstance, optionChoice,
-                               (*env)->NewStringUTF(env, attr != NULL ? ippGetString(attr, 0, NULL)
-                                                                      : ""));
-        (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
-        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+                               (*env)->NewStringUTF(env,
+                                                    attr != NULL ? ippGetString(attr, 0, NULL)
+                                                                 : ""));
+        (*env)->SetObjectField(env, optionInstance, optionItems,
+                               itemListInstance);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun,
+                                  optionInstance);
 
+        attr = ippFindAttribute(response, "job-sheets-supported",
+                                IPP_TAG_ZERO);
 
-        attr = ippFindAttribute(response, "job-sheets-supported", IPP_TAG_ZERO);
-
-        jobject optionInstance2 = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        jobject optionInstance2 = (*env)->NewObject(env, optionClass,
+                                                    optionConstruction, "");
         //set
         (*env)->SetObjectField(env, optionInstance2, optionKey,
                                (*env)->NewStringUTF(env, "job_sheets_end"));
         (*env)->SetObjectField(env, optionInstance2, optionText,
                                (*env)->NewStringUTF(env, cgiText("Ending Banner")));
-        jobject itemListInstance2 = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                      "");
+        jobject itemListInstance2 = (*env)->NewObject(env, itemListClass,
+                                                      itemListConstruction, "");
         int j;
         for (j = 0; j < ippGetCount(attr); j++) {
-            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            jobject itemInstance = (*env)->NewObject(env, itemClass,
+                                                     itemConstruction, "");
             (*env)->SetObjectField(env, itemInstance, itemChoice,
                                    (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
             (*env)->SetObjectField(env, itemInstance, itemText,
                                    (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
-            (*env)->CallBooleanMethod(env, itemListInstance2, itemListAddFun,
-                                      itemInstance);
+            (*env)->CallBooleanMethod(env, itemListInstance2,
+                                      itemListAddFun, itemInstance);
 
         }
-        attr = ippFindAttribute(response, "job-sheets-default", IPP_TAG_ZERO);
+        attr = ippFindAttribute(response, "job-sheets-default",
+                                IPP_TAG_ZERO);
         (*env)->SetObjectField(env, optionInstance2, optionChoice,
-                               (*env)->NewStringUTF(env, attr != NULL && ippGetCount(attr) > 1
-                                                         ? ippGetString(attr, 1, NULL) : ""));
-        (*env)->SetObjectField(env, optionInstance2, optionItems, itemListInstance2);
-        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance2);
+                               (*env)->NewStringUTF(env,
+                                                    attr != NULL && ippGetCount(attr) > 1 ?
+                                                    ippGetString(attr, 1, NULL) : ""));
+        (*env)->SetObjectField(env, optionInstance2, optionItems,
+                               itemListInstance2);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun,
+                                  optionInstance2);
         return optionListInstance;
     }
     /*   policy   */
     if (strcasecmp(groupname, "Policies") == 0) if (
             ippFindAttribute(response, "printer-error-policy-supported",
-                             IPP_TAG_ZERO) ||
-            ippFindAttribute(response, "printer-op-policy-supported",
-                             IPP_TAG_ZERO)) {
-
+                             IPP_TAG_ZERO)
+            || ippFindAttribute(response, "printer-op-policy-supported",
+                                IPP_TAG_ZERO)) {
 
         attr = ippFindAttribute(response, "printer-error-policy-supported",
                                 IPP_TAG_ZERO);
         if (attr) {
-            jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+            jobject optionInstance = (*env)->NewObject(env, optionClass,
+                                                       optionConstruction, "");
             //set
             (*env)->SetObjectField(env, optionInstance, optionKey,
                                    (*env)->NewStringUTF(env, "printer_error_policy"));
             (*env)->SetObjectField(env, optionInstance, optionText,
                                    (*env)->NewStringUTF(env, cgiText("Error Policy")));
-            jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                         "");
+            jobject itemListInstance = (*env)->NewObject(env, itemListClass,
+                                                         itemListConstruction, "");
             int k;
             for (k = 0; k < ippGetCount(attr); k++) {
-                jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+                jobject itemInstance = (*env)->NewObject(env, itemClass,
+                                                         itemConstruction, "");
                 (*env)->SetObjectField(env, itemInstance, itemChoice,
-                                       (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
+                                       (*env)->NewStringUTF(env,
+                                                            ippGetString(attr, k, NULL)));
                 (*env)->SetObjectField(env, itemInstance, itemText,
-                                       (*env)->NewStringUTF(env, ippGetString(attr, k, NULL)));
-                (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
-                                          itemInstance);
+                                       (*env)->NewStringUTF(env,
+                                                            ippGetString(attr, k, NULL)));
+                (*env)->CallBooleanMethod(env, itemListInstance,
+                                          itemListAddFun, itemInstance);
 
             }
-            attr = ippFindAttribute(response, "printer-error-policy", IPP_TAG_ZERO);
+            attr = ippFindAttribute(response, "printer-error-policy",
+                                    IPP_TAG_ZERO);
             (*env)->SetObjectField(env, optionInstance, optionChoice,
                                    (*env)->NewStringUTF(env,
                                                         attr == NULL ? "" : ippGetString(attr, 0,
                                                                                          NULL)));
-            (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
-            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+            (*env)->SetObjectField(env, optionInstance, optionItems,
+                                   itemListInstance);
+            (*env)->CallBooleanMethod(env, optionListInstance,
+                                      optionListAddFun, optionInstance);
         }
 
         attr = ippFindAttribute(response, "printer-op-policy-supported",
                                 IPP_TAG_ZERO);
         if (attr) {
-            jobject optionInstance2 = (*env)->NewObject(env, optionClass, optionConstruction, "");
+            jobject optionInstance2 = (*env)->NewObject(env, optionClass,
+                                                        optionConstruction, "");
             //set
             (*env)->SetObjectField(env, optionInstance2, optionKey,
                                    (*env)->NewStringUTF(env, "printer_op_policy"));
             (*env)->SetObjectField(env, optionInstance2, optionText,
                                    (*env)->NewStringUTF(env, cgiText("Operation Policy")));
-            jobject itemListInstance2 = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                          "");
+            jobject itemListInstance2 = (*env)->NewObject(env,
+                                                          itemListClass, itemListConstruction, "");
             int j;
             for (j = 0; j < ippGetCount(attr); j++) {
-                jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+                jobject itemInstance = (*env)->NewObject(env, itemClass,
+                                                         itemConstruction, "");
                 (*env)->SetObjectField(env, itemInstance, itemChoice,
-                                       (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
+                                       (*env)->NewStringUTF(env,
+                                                            ippGetString(attr, j, NULL)));
                 (*env)->SetObjectField(env, itemInstance, itemText,
-                                       (*env)->NewStringUTF(env, ippGetString(attr, j, NULL)));
-                (*env)->CallBooleanMethod(env, itemListInstance2, itemListAddFun,
-                                          itemInstance);
+                                       (*env)->NewStringUTF(env,
+                                                            ippGetString(attr, j, NULL)));
+                (*env)->CallBooleanMethod(env, itemListInstance2,
+                                          itemListAddFun, itemInstance);
             }
-            attr = ippFindAttribute(response, "printer-op-policy", IPP_TAG_ZERO);
+            attr = ippFindAttribute(response, "printer-op-policy",
+                                    IPP_TAG_ZERO);
             (*env)->SetObjectField(env, optionInstance2, optionChoice,
-                                   (*env)->NewStringUTF(env, attr == NULL ?
-                                                             "" : ippGetString(attr, 0, NULL)));
-            (*env)->SetObjectField(env, optionInstance2, optionItems, itemListInstance2);
-            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance2);
+                                   (*env)->NewStringUTF(env,
+                                                        attr == NULL ?
+                                                        "" : ippGetString(attr, 0, NULL)));
+            (*env)->SetObjectField(env, optionInstance2, optionItems,
+                                   itemListInstance2);
+            (*env)->CallBooleanMethod(env, optionListInstance,
+                                      optionListAddFun, optionInstance2);
         }
         return optionListInstance;
     }
@@ -350,18 +470,20 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
     if (strcasecmp(groupname, "Port Monitor") == 0) if (
             (attr = ippFindAttribute(response, "port-monitor-supported",
                                      IPP_TAG_NAME)) != NULL && ippGetCount(attr) > 1) {
-        jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+        jobject optionInstance = (*env)->NewObject(env, optionClass,
+                                                   optionConstruction, "");
         //set
         (*env)->SetObjectField(env, optionInstance, optionKey,
                                (*env)->NewStringUTF(env, "port_monitor"));
         (*env)->SetObjectField(env, optionInstance, optionText,
                                (*env)->NewStringUTF(env, cgiText("Port Monitor")));
-        jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                     "");
+        jobject itemListInstance = (*env)->NewObject(env, itemListClass,
+                                                     itemListConstruction, "");
 
         int i;
         for (i = 0; i < ippGetCount(attr); i++) {
-            jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
+            jobject itemInstance = (*env)->NewObject(env, itemClass,
+                                                     itemConstruction, "");
             (*env)->SetObjectField(env, itemInstance, itemChoice,
                                    (*env)->NewStringUTF(env, ippGetString(attr, i, NULL)));
             (*env)->SetObjectField(env, itemInstance, itemText,
@@ -374,82 +496,108 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFrag
         (*env)->SetObjectField(env, optionInstance, optionChoice,
                                (*env)->NewStringUTF(env,
                                                     attr ? ippGetString(attr, 0, NULL) : "none"));
-        (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
-        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+        (*env)->SetObjectField(env, optionInstance, optionItems,
+                               itemListInstance);
+        (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun,
+                                  optionInstance);
         return optionListInstance;
     }
 
     /*   for group in ppd files  */
-    int found_pagesize = 0 ;
+    int found_pagesize = 0;
     for (i = 0, group = ppd->groups; i < ppd->num_groups; ++i, group++) {
         if (strcasecmp(group->text, groupname)) {
             continue;
         }
 
-        for (j = 0, option = group->options; j < group->num_options; ++j, option++) {
+        for (j = 0, option = group->options; j < group->num_options;
+             ++j, option++) {
 
-            jobject optionInstance = (*env)->NewObject(env, optionClass, optionConstruction, "");
+            jobject optionInstance = (*env)->NewObject(env, optionClass,
+                                                       optionConstruction, "");
 
             //set
-            (*env)->SetObjectField(env, optionInstance, optionKey,
-                                   (*env)->NewStringUTF(env, option->keyword));
-            (*env)->SetObjectField(env, optionInstance, optionText,
-                                   (*env)->NewStringUTF(env, option->text));
-            (*env)->SetObjectField(env, optionInstance, optionUI,
-                                   (*env)->NewStringUTF(env, uis[option->ui]));
+            jstring tempKey = (*env)->NewStringUTF(env, option->keyword);
+            (*env)->SetObjectField(env, optionInstance, optionKey, tempKey);
+            (*env)->DeleteLocalRef(env, tempKey);
+
+            jstring tempText = (*env)->NewStringUTF(env, option->text);
+            (*env)->SetObjectField(env, optionInstance, optionText, tempText);
+            (*env)->DeleteLocalRef(env, tempText);
+
+            jstring tempUI = (*env)->NewStringUTF(env, uis[option->ui]);
+            (*env)->SetObjectField(env, optionInstance, optionUI, tempUI);
+            (*env)->DeleteLocalRef(env, tempUI);
+
+            jstring tempSection = (*env)->NewStringUTF(env,
+                                                       sections[option->section]);
             (*env)->SetObjectField(env, optionInstance, optionSection,
-                                   (*env)->NewStringUTF(env, sections[option->section]));
-            (*env)->SetIntField(env, optionInstance, optionOrder, (jint) option->order);
+                                   tempSection);
+            (*env)->DeleteLocalRef(env, tempSection);
 
+            (*env)->SetIntField(env, optionInstance, optionOrder,
+                                (jint) option->order);
 
-            jobject itemListInstance = (*env)->NewObject(env, itemListClass, itemListConstruction,
-                                                         "");
+            jobject itemListInstance = (*env)->NewObject(env, itemListClass,
+                                                         itemListConstruction, "");
 
-            if (strcmp(option->keyword, "PageSize") == 0 ||
-                strcmp(option->keyword, "PageRegion") == 0 ||
-				strcmp(option->keyword, "PaperDimension") == 0 ||
-				strcmp(option->keyword, "ImageableArea") == 0) {
-            	if(found_pagesize != 0) continue;
-            	found_pagesize = 1;
-                for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
-                    if (strcmp(option->defchoice, choice->choice) == 0)
-                        (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->choice));
+            if (strcmp(option->keyword, "PageSize") == 0
+                || strcmp(option->keyword, "PageRegion") == 0
+                || strcmp(option->keyword, "PaperDimension") == 0
+                || strcmp(option->keyword, "ImageableArea") == 0) {
+                if (found_pagesize != 0)
+                    continue;
+                found_pagesize = 1;
+                for (m = option->num_choices, choice = option->choices; m > 0;
+                     m--, choice++) {
+                    if (strcmp(option->defchoice, choice->choice) == 0) {
+                        jstring tempInstance = (*env)->NewStringUTF(env, choice->choice);
+                        (*env)->SetObjectField(env, optionInstance, optionChoice, tempInstance);
+                        (*env)->DeleteLocalRef(env, tempInstance);
+                    }
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
-                    (*env)->SetObjectField(env, itemInstance, itemChoice,
-                                           (*env)->NewStringUTF(env, choice->choice));
-                    (*env)->SetObjectField(env, itemInstance, itemText,
-                                           (*env)->NewStringUTF(env, choice->text));
-                    (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
-                                              itemInstance);
+                    jstring tempChoice = (*env)->NewStringUTF(env, choice->choice);
+                    (*env)->SetObjectField(env, itemInstance, itemChoice, tempChoice);
+                    (*env)->DeleteLocalRef(env, tempChoice);
+
+                    jstring tempChoiceText = (*env)->NewStringUTF(env, choice->text);
+                    (*env)->SetObjectField(env, itemInstance, itemText, tempChoiceText);
+                    (*env)->DeleteLocalRef(env, tempChoiceText);
+
+                    (*env)->CallBooleanMethod(env, itemListInstance,
+                                              itemListAddFun, itemInstance);
                 }
-            }
-            else {
-                for (m = option->num_choices, choice = option->choices; m > 0; m--, choice++) {
-                    if (strcmp(option->defchoice, choice->choice) == 0)
-                        (*env)->SetObjectField(env, optionInstance, optionChoice,
-                                               (*env)->NewStringUTF(env, choice->choice));
+            } else {
+                for (m = option->num_choices, choice = option->choices; m > 0;
+                     m--, choice++) {
+                    if (strcmp(option->defchoice, choice->choice) == 0) {
+                        jstring tempInstance = (*env)->NewStringUTF(env, choice->choice);
+                        (*env)->SetObjectField(env, optionInstance, optionChoice, tempInstance);
+                        (*env)->DeleteLocalRef(env, tempInstance);
+                    }
                     jobject itemInstance = (*env)->NewObject(env, itemClass, itemConstruction, "");
 
-                    (*env)->SetObjectField(env, itemInstance, itemChoice,
-                                           (*env)->NewStringUTF(env, choice->choice));
-                    (*env)->SetObjectField(env, itemInstance, itemText,
-                                           (*env)->NewStringUTF(env, choice->text));
-                    (*env)->CallBooleanMethod(env, itemListInstance, itemListAddFun,
-                                              itemInstance);
+
+                    jstring tempChoice = (*env)->NewStringUTF(env, choice->choice);
+                    (*env)->SetObjectField(env, itemInstance, itemChoice, tempChoice);
+                    (*env)->DeleteLocalRef(env, tempChoice);
+
+                    jstring tempChoiceText = (*env)->NewStringUTF(env, choice->text);
+                    (*env)->SetObjectField(env, itemInstance, itemText, tempChoiceText);
+                    (*env)->DeleteLocalRef(env, tempChoiceText);
+
+                    (*env)->CallBooleanMethod(env, itemListInstance,
+                                              itemListAddFun, itemInstance);
                 }
             }
 
-            (*env)->SetObjectField(env, optionInstance, optionItems, itemListInstance);
-            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun, optionInstance);
+            (*env)->SetObjectField(env, optionInstance, optionItems,
+                                   itemListInstance);
+            (*env)->CallBooleanMethod(env, optionListInstance, optionListAddFun,
+                                      optionInstance);
         }
     }
     return optionListInstance;
 }
-
-
-
-
-
 

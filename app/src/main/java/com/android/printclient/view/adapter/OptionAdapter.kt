@@ -67,7 +67,11 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
             holder.itemText.text = option.text
             holder.itemText.tag = option.key
             holder.itemCheckBox.isSelected = option.choice!!.toUpperCase().equals("TRUE")
-            holder.itemCheckBox.setOnCheckedChangeListener { v, select -> onItemOrBoxClicked!!.onClickBox(option.key, select) }
+            holder.itemCheckBox.setOnCheckedChangeListener {
+                v, select ->
+                onItemOrBoxClicked!!.onClickBox(option.key, select)
+                holder.itemCheckBox.isChecked = !holder.itemCheckBox.isChecked
+            }
         } else if (holder is OneHolder) {
             holder.itemText.text = option.text
             var options = option.items.filter { it.choice.equals(option.choice) }
