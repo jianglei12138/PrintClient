@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.android.menu.MainActivity">
+    <item
+        android:id="@+id/action_alert"
+        android:orderInCategory="100"
+        android:title="alert"
+        android:icon="@drawable/ic_notifications"
+        app:showAsAction="always" />
+</menu>

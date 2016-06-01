@@ -71,5 +71,6 @@
     <string name="options_installed">选项已安装</string>
     <string name="jcl">作业控制语言</string>
     <string name="option_TextView">没有合适的选项</string>
+    <string name="conflict_message">存在冲突</string>
 
 </resources>
