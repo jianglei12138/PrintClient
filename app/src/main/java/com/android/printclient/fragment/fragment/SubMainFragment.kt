@@ -10,6 +10,7 @@ import android.widget.ListView
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.dialog.PrinterDialog
+import com.android.printclient.objects.Job
 import com.android.printclient.objects.Printer
 import com.android.printclient.view.adapter.MainAdapter
 import java.util.*
@@ -35,6 +36,7 @@ class SubMainFragment : Fragment() {
     }
 
     external fun getPrinters(): List<Printer>
+    external fun getJobs(): List<Job>
     external fun getAttributePrinter(name: String, instance: String?): HashMap<String, String>
     external fun checkCupsd(): Boolean
 
@@ -81,6 +83,31 @@ class SubMainFragment : Fragment() {
                         instance = classes[position].instance
                     }
                     var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name, instance), name)
+                    dialog.show()
+                }
+
+                printerListView.emptyView = emptyView
+                printerListView.adapter = adapter
+            }
+            getString(R.string.title_jobs) -> {
+                var jobs = getJobs()
+                var adapter: MainAdapter = MainAdapter(jobs, activity, 1)
+                printerListView.onItemClickListener = AdapterView.OnItemClickListener {
+                    parent, view, position, id ->
+                    var job = jobs[position]
+                    var map = HashMap<String, String>()
+                    map.put("ID", job.id.toString())
+                    map.put("Title", job.title + "")
+                    map.put("Dest", job.dest + "")
+                    map.put("Format", job.format + "")
+                    map.put("User", job.user + "");
+                    map.put("Completed_time", job.completed_time.toString());
+                    map.put("Creation_time", job.creation_time.toString());
+                    map.put("Size", job.size.toString());
+                    map.put("Priority", job.priority.toString());
+                    map.put("Processing_time", job.processing_time.toString());
+                    map.put("Size", job.size.toString());
+                    var dialog: PrinterDialog = PrinterDialog(activity, map, job.title + " #" + job.id)
                     dialog.show()
                 }
 

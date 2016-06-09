@@ -76,5 +76,22 @@
     <string name="title_class">打印机类</string>
     <string name="title_jobs">任务</string>
     <string name="title_rss">订阅</string>
-
+    <string name="job_state_complete">已完成</string>
+    <string name="job_state_stop">已停止</string>
+    <string name="job_state_abort">已终止</string>
+    <string name="job_state_held">已保留</string>
+    <string name="job_state_pending">已挂起</string>
+    <string name="job_state_processing">处理中</string>
+    <string name="job_state_cancel">已取消</string>
+    <string name="id">ID</string>
+    <string name="title">作业名</string>
+    <string name="dest">目标打印机</string>
+    <string name="format">格式</string>
+    <string name="user">用户</string>
+    <string name="complete_time">完成时间</string>
+    <string name="creation_time">创建时间</string>
+    <string name="size">大小</string>
+    <string name="priority">优先级</string>
+    <string name="processing_time">处理时间</string>
+    <string name="state">任务状态</string>
 </resources>

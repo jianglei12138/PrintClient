@@ -12,14 +12,6 @@
 static jobject options_instance;
 //static jmethodID options_add;
 
-
-char *getServerPpd(const char *name) {
-    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
-    http_t *http_t = gethttp_t();
-    char *ppdfile = (char *) cupsGetPPD2(http_t, name);
-    return ppdfile;
-}
-
 JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_getOptionGroups(
         JNIEnv *env, jobject jthis, jstring name) {
 
@@ -105,14 +97,16 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_OptionFragment_g
         JNIEnv *env, jobject jthis, jstring name) {
 
     ppd_file_t *ppd;           /* PPD file record    */
+    http_t *http;
     ppd_group_t *group;        /* UI group           */
     ppd_option_t *option;      /* Standard UI option */
     const char *printer;       /* printer name       */
     const char *filename;      /*ppd file and path   */
 
+    http = gethttp_t();
     printer = (*env)->GetStringUTFChars(env, name, 0);
 
-    filename = getServerPpd(printer);
+    filename = cupsGetPPD2(http, printer);
 
     if ((ppd = ppdOpenFile(filename)) == NULL) {
         __android_log_print(ANDROID_LOG_ERROR, "JNIEnv", "Unable to open \'%s\' as a PPD file!\n",
@@ -185,8 +179,14 @@ JNIEXPORT void JNICALL Java_com_android_printclient_fragment_OptionFragment_real
     //(*env)->DeleteGlobalRef(env,options_add);
 }
 
+char *getServerPpd(const char *name) {
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    http_t *http_t = gethttp_t();
+    char *ppdfile = (char *) cupsGetPPD2(http_t, name);
+    return ppdfile;
+}
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubOptionsFragment_getGroup(
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFragment_getGroup(
         JNIEnv *env, jobject jthis, jstring groupString, jstring printerString) {
 
     //set env

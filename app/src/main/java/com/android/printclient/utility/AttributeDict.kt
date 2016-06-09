@@ -30,5 +30,17 @@ class AttributeDict(context: Context) {
         dictionary.put("printer-state-reasons",context.getString(R.string.printer_state_reasons));
         dictionary.put("printer-type",context.getString(R.string.printer_type));
         dictionary.put("printer-uri-supported",context.getString(R.string.printer_uri_supported));
+
+        dictionary.put("ID",context.getString(R.string.id))
+        dictionary.put("Title", context.getString(R.string.title))
+        dictionary.put("Dest",context.getString(R.string.dest))
+        dictionary.put("Format", context.getString(R.string.format))
+        dictionary.put("User", context.getString(R.string.user))
+        dictionary.put("Completed_time", context.getString(R.string.complete_time))
+        dictionary.put("Creation_time", context.getString(R.string.creation_time))
+        dictionary.put("Size",context.getString(R.string.size))
+        dictionary.put("Priority", context.getString(R.string.priority))
+        dictionary.put("Processing_time", context.getString(R.string.processing_time))
+        dictionary.put("state", context.getString(R.string.state))
     }
 }
