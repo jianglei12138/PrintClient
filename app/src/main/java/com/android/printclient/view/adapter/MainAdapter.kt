@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import com.android.printclient.R
 import com.android.printclient.objects.Printer
@@ -13,12 +14,14 @@ import com.android.printclient.objects.Printer
  */
 class MainAdapter : BaseAdapter {
 
-    var printers: List<Printer>? = null
-    var context: Context? = null
+    var printers: List<Printer>
+    var context: Context
+    var type: Int
 
-    constructor(printers: List<Printer>?, context: Context?) : super() {
-        this.printers = printers
+    constructor(printers: List<Printer>?, context: Context, type: Int) : super() {
+        this.printers = printers!!
         this.context = context
+        this.type = type
     }
 
 
@@ -31,11 +34,16 @@ class MainAdapter : BaseAdapter {
             holder.instance = convertView.findViewById(R.id.instance_textView) as TextView
             holder.uri = convertView.findViewById(R.id.url_textView) as TextView
             holder.default = convertView.findViewById(R.id.default_textView)
+            holder.icon = convertView.findViewById(R.id.imageView) as ImageView
             convertView.tag = holder
         }
 
         var holder: ViewHolder = convertView.tag as ViewHolder
-        var printer = printers!![position]
+        var printer = printers[position]
+        if (type == 0)
+            holder.icon!!.setImageDrawable(context.getDrawable(R.drawable.printer))
+        else if (type == 1)
+            holder.icon!!.setImageDrawable(context.getDrawable(R.drawable.classes))
         holder.name!!.text = printer.name
         holder.instance!!.text = printer.instance
         holder.uri!!.text = printer.deviceuri
@@ -49,7 +57,7 @@ class MainAdapter : BaseAdapter {
     }
 
     override fun getItem(position: Int): Any? {
-        return printers!![position]
+        return printers[position]
     }
 
     override fun getItemId(position: Int): Long {
@@ -57,7 +65,7 @@ class MainAdapter : BaseAdapter {
     }
 
     override fun getCount(): Int {
-        return printers!!.size
+        return printers.size
     }
 
 
@@ -66,5 +74,6 @@ class MainAdapter : BaseAdapter {
         var instance: TextView? = null
         var uri: TextView? = null
         var default: View? = null
+        var icon: ImageView? = null
     }
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">打印</string>
     <string name="empty_TextView">没有添加打印机</string>
-    <string name="save_printers">管理</string>
+    <string name="save_printers">打印机管理</string>
     <string name="add_printers">添加打印机</string>
     <string name="set_options">设置打印机选项</string>
     <string name="local_printer">本地打印机</string>

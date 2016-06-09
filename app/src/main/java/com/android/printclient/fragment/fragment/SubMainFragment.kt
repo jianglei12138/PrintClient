@@ -24,6 +24,7 @@ class SubMainFragment : Fragment() {
 
     companion object {
         val ARG_SELECTION_TITLE = "title"
+        val CLASSES_URI = "file:///dev/null"
         fun newInstance(title: String): SubMainFragment {
             val fragment = SubMainFragment()
             val args = Bundle()
@@ -53,8 +54,9 @@ class SubMainFragment : Fragment() {
 
         when (title) {
             getString(R.string.title_printer) -> {
-                var printers = getPrinters()
-                var adapter: MainAdapter = MainAdapter(printers, activity)
+                var printers = getPrinters().filter { !it.deviceuri.equals(CLASSES_URI) }
+
+                var adapter: MainAdapter = MainAdapter(printers, activity, 0)
                 printerListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
                     var instance: String? = null
                     var name: String = printers[position].name
@@ -69,7 +71,21 @@ class SubMainFragment : Fragment() {
                 printerListView.adapter = adapter
             }
             getString(R.string.title_class) -> {
+                var classes = getPrinters().filter { it.deviceuri.equals(CLASSES_URI) }
 
+                var adapter: MainAdapter = MainAdapter(classes, activity, 1)
+                printerListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+                    var instance: String? = null
+                    var name: String = classes[position].name
+                    if (classes[position].instance.length > 0) {
+                        instance = classes[position].instance
+                    }
+                    var dialog: PrinterDialog = PrinterDialog(activity, getAttributePrinter(name, instance), name)
+                    dialog.show()
+                }
+
+                printerListView.emptyView = emptyView
+                printerListView.adapter = adapter
             }
         }
         return view

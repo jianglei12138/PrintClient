@@ -26,7 +26,7 @@ class OptionAdapter : RecyclerView.Adapter<OptionAdapter.AbsViewHolder> {
         val TYPE_PICKMANY = 3
 
 
-//        enum class TYPE(var type: Int) {
+//        enum classes TYPE(var type: Int) {
 //            BOOLEAN(1), PICKONE(2), PICKMANY(3)
 //        }
     }
