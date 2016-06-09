@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">打印</string>
-    <string name="empty_TextView">没有添加打印机</string>
-    <string name="save_printers">现有打印机</string>
-    <string name="add_printers">添加打印机</string>
-    <string name="local_printer">本地打印机</string>
-    <string name="network_printer">搜索到的打印机</string>
-    <string name="other_printer">其他网络打印机</string>
+    <string name="app_name">Print</string>
+    <string name="empty_TextView">no available printers</string>
+    <string name="save_printers">administration</string>
+    <string name="add_printers">add printers</string>
+    <string name="local_printer">local printers</string>
+    <string name="network_printer">found printers </string>
+    <string name="other_printer">other printer </string>
 </resources>

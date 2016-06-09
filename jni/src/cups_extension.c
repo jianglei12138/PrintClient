@@ -5,7 +5,7 @@
 
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"JNIEnv",__VA_ARGS__)
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_MainFragment_getPrinters(
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubMainFragment_getPrinters(
         JNIEnv *env, jobject jthis) {
 
     jclass printer;             /*a printer object class   */
@@ -68,7 +68,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_MainFragment_get
     return client_printer_list_instance;
 }
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_MainFragment_getAttributePrinter(
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubMainFragment_getAttributePrinter(
         JNIEnv *env, jobject jthis, jstring name, jstring instance) {
 
     int i; /*for loop       */

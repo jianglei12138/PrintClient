@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         val SHARED_NAME = "_ppd_init"
         val INIT_NAME = "_init_over"
-        val FILE_SELECT_CODE = 0x11;
+        val FILE_SELECT_CODE = 0x11
         val CHOOSE_PPD_ACTION = "com.android.printclient.choose.ppd"
         val READ_STORAGE_CODE = 200
     }
@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(toolbar);
+         setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
             //add fragment

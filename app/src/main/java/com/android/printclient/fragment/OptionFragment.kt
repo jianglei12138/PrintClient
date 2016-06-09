@@ -14,7 +14,7 @@ import android.view.*
 import com.android.printclient.MainActivity
 import com.android.printclient.R
 import com.android.printclient.objects.Conflict
-import com.android.printclient.view.adapter.TabAdapter
+import com.android.printclient.view.adapter.OptionTabAdapter
 import java.util.*
 
 /**
@@ -62,7 +62,7 @@ class OptionFragment : Fragment() {
         listConflict = getConflictData(printer!!)
         if (listConflict.size > 0) isConflict = true
 
-        val adapter = TabAdapter(childFragmentManager, list, printer!!, context)
+        val adapter = OptionTabAdapter(childFragmentManager, list, printer!!, context)
 
         val mViewPager = view.findViewById(R.id.viewPager) as ViewPager
         mViewPager.adapter = adapter
@@ -90,12 +90,6 @@ class OptionFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
-            R.id.action_alert -> {
-
-            }
-
-        }
         return super.onOptionsItemSelected(item)
     }
 

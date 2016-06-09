@@ -1,6 +1,7 @@
 package com.android.printclient.fragment
 
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.widget.LinearLayoutManager
@@ -62,7 +63,11 @@ class AddFragment : Fragment() {
         //init broadcast
 //        var fragmentFilter = IntentFilter(FRAGMENT_TOGGLE_ACTION)
 //        context.registerReceiver(fragmentToggole, fragmentFilter)
-
+        if (activity is MainActivity) {
+            var act = activity
+            var tabs = act.findViewById(R.id.tabs) as TabLayout
+            tabs.visibility = View.GONE
+        }
 
         //init data list
         data.add(activity.getString(R.string.local_printer))

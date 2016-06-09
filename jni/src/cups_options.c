@@ -186,7 +186,7 @@ JNIEXPORT void JNICALL Java_com_android_printclient_fragment_OptionFragment_real
 }
 
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubFragment_getGroup(
+JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubOptionsFragment_getGroup(
         JNIEnv *env, jobject jthis, jstring groupString, jstring printerString) {
 
     //set env

@@ -18,7 +18,7 @@ import java.util.*
 /**
  * Created by jianglei on 16/5/23.
  */
-class SubFragment : Fragment() {
+class SubOptionsFragment : Fragment() {
 
     init {
         System.loadLibrary("options")
@@ -28,8 +28,8 @@ class SubFragment : Fragment() {
     companion object {
         val ARG_SELECTION_TITLE = "title"
         val ARG_SELECTION_NAME = "name"
-        fun newInstance(title: String, printer: String): SubFragment {
-            val fragment = SubFragment()
+        fun newInstance(title: String, printer: String): SubOptionsFragment {
+            val fragment = SubOptionsFragment()
             val args = Bundle()
             args.putString(ARG_SELECTION_TITLE, title)
             args.putString(ARG_SELECTION_NAME, printer)
@@ -41,7 +41,7 @@ class SubFragment : Fragment() {
     external fun getGroup(group: String, printer: String): List<Option>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        var view = inflater!!.inflate(R.layout.fragment_sub, container, false)
+        var view = inflater!!.inflate(R.layout.fragment_suboption, container, false)
 
         val title = arguments.getString(ARG_SELECTION_TITLE)
         val name = arguments.getString(ARG_SELECTION_NAME)

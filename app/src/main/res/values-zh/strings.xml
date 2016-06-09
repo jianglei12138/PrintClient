@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">打印</string>
     <string name="empty_TextView">没有添加打印机</string>
-    <string name="save_printers">现有打印机</string>
+    <string name="save_printers">管理</string>
     <string name="add_printers">添加打印机</string>
     <string name="set_options">设置打印机选项</string>
     <string name="local_printer">本地打印机</string>
@@ -71,6 +71,10 @@
     <string name="options_installed">选项已安装</string>
     <string name="jcl">作业控制语言</string>
     <string name="option_TextView">没有合适的选项</string>
-    <string name="conflict_message">存在冲突</string>
+    <string name="conflict_message">选项存在冲突</string>
+    <string name="title_printer">打印机</string>
+    <string name="title_class">打印机类</string>
+    <string name="title_jobs">任务</string>
+    <string name="title_rss">订阅</string>
 
 </resources>

@@ -5,14 +5,14 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.util.Log
-import com.android.printclient.fragment.fragment.SubFragment
+import com.android.printclient.fragment.fragment.SubOptionsFragment
 import com.android.printclient.utility.TabDict
 import java.util.*
 
 /**
  * Created by jianglei on 16/5/23.
  */
-class TabAdapter : FragmentPagerAdapter {
+class OptionTabAdapter : FragmentPagerAdapter {
 
     var title: List<String>
     var printer: String
@@ -29,7 +29,7 @@ class TabAdapter : FragmentPagerAdapter {
     }
 
     override fun getItem(position: Int): Fragment {
-        return SubFragment.newInstance(title[position],printer)
+        return SubOptionsFragment.newInstance(title[position],printer)
     }
 
     override fun getCount(): Int {
