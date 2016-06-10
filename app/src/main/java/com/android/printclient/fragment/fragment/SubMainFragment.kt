@@ -1,7 +1,9 @@
 package com.android.printclient.fragment.fragment
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +25,7 @@ class SubMainFragment : Fragment() {
         System.loadLibrary("extension")
     }
 
+
     companion object {
         val ARG_SELECTION_TITLE = "title"
         val CLASSES_URI = "file:///dev/null"
@@ -39,6 +42,7 @@ class SubMainFragment : Fragment() {
     external fun getJobs(): List<Job>
     external fun getAttributePrinter(name: String, instance: String?): HashMap<String, String>
     external fun checkCupsd(): Boolean
+    external fun cancelJob(dest: String, id: Int): Boolean
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //inflater view
@@ -92,8 +96,7 @@ class SubMainFragment : Fragment() {
             getString(R.string.title_jobs) -> {
                 var jobs = getJobs()
                 var adapter: MainAdapter = MainAdapter(jobs, activity, 1)
-                printerListView.onItemClickListener = AdapterView.OnItemClickListener {
-                    parent, view, position, id ->
+                printerListView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, view, position, id ->
                     var job = jobs[position]
                     var map = HashMap<String, String>()
                     map.put("ID", job.id.toString())
@@ -109,8 +112,32 @@ class SubMainFragment : Fragment() {
                     map.put("Size", job.size.toString());
                     var dialog: PrinterDialog = PrinterDialog(activity, map, job.title + " #" + job.id)
                     dialog.show()
+                    false
                 }
+                printerListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, v, i, l ->
+                    if (jobs[i].state.equals(MainAdapter.IPP_JSTATE_STOPPED))
+                        AlertDialog.Builder(context)
+                                .setTitle(R.string.job_operation)
+                                .setItems(R.array.job_operation_array, { dialogInterface, i ->
+                                    when (i) {
+                                        0 -> {
 
+                                        }
+                                        1 -> {
+                                            var result = cancelJob(jobs[i].dest!!, jobs[i].id)
+                                            if (result)
+                                                Snackbar.make(view, getString(R.string.cancel_failure), Snackbar.LENGTH_LONG).show()
+                                            else
+                                                Snackbar.make(view, getString(R.string.cancel_success), Snackbar.LENGTH_LONG).show()
+                                        }
+
+                                        2 -> {
+
+                                        }
+                                    }
+                                })
+                                .show()
+                }
                 printerListView.emptyView = emptyView
                 printerListView.adapter = adapter
             }

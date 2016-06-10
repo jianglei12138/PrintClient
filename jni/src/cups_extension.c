@@ -175,7 +175,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubMain
         jstring dest_user = (*env)->NewStringUTF(env, jobs[i].user ? jobs[i].user : "");
         jstring dest_format = (*env)->NewStringUTF(env, jobs[i].format ? jobs[i].format : "");
         jint dest_id = jobs[i].id;
-        jint dest_state = jobs[i].state - 3 ;
+        jint dest_state = jobs[i].state - 3;
         jint dest_priority = jobs[i].priority;
         jlong dest_completed_time = jobs[i].completed_time;
         jlong dest_creation_time = jobs[i].creation_time;
@@ -233,4 +233,19 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_fragment_fragment_SubMain
         (*env)->CallBooleanMethod(env, job_list_instance, job_list_add, dest_job);
     }
     return job_list_instance;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_com_android_printclient_fragment_fragment_SubMainFragment_cancelJob(
+        JNIEnv *env, jobject jthis, jstring dest, jint id) {
+    const char *destination = (*env)->GetStringUTFChars(env, dest, 0);
+    int result = cupsCancelJob(destination, id);
+    return (jboolean) result;
+}
+
+
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getPrinters(
+        JNIEnv *env, jobject jthis) {
+    return Java_com_android_printclient_fragment_fragment_SubMainFragment_getPrinters(env,jthis);
 }
