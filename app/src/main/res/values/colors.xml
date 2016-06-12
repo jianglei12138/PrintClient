@@ -15,5 +15,5 @@
     <color name="colorPressed">#78000000</color>
     <color name="colorTabTitle">#BFBFBF</color>
     <color name="colorItemDecoration">#FEFEFE</color>
-
+    <color name="colorPreview">#883396d4</color>
 </resources>

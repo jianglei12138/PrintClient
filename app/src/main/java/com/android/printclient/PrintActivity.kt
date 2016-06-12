@@ -1,7 +1,5 @@
 package com.android.printclient
 
-import android.graphics.Color
-import android.graphics.Paint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.PopupMenu
@@ -11,7 +9,6 @@ import android.view.View
 import android.widget.Toast
 import com.android.printclient.objects.Printer
 import kotlinx.android.synthetic.main.activity_spooler.*
-import kotlinx.android.synthetic.main.content_spooler.*
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.io.File
 
@@ -29,8 +26,7 @@ class PrintActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.setHomeButtonEnabled(true)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        title = "打印机: "
+        title = ""
 
         var array = getPrinters()
         text.text = array[0].name
@@ -40,17 +36,16 @@ class PrintActivity : AppCompatActivity() {
 
         spinner.setOnClickListener { v -> showPopup(v, array) }
 
+        page_textView.text = getString(R.string.preview_page, 1)
         pdfView.fromFile(File(intent.data.path))
+
                 .defaultPage(1)
-                .showMinimap(true)
+                .showMinimap(false)
                 .enableSwipe(true)
-                .onDraw({ canvas, w, h, i ->
-                    var paint = Paint(Paint.ANTI_ALIAS_FLAG)
-                    paint.color = Color.BLACK
-                    canvas.drawText("第 $i 页",10f,20f,paint)
-                })
-                .onLoad({  })
-                .onPageChange({ i1, i2 ->  })
+                .enableDoubletap(false)
+                .onDraw({ canvas, w, h, i -> })
+                .onLoad({ })
+                .onPageChange({ page, pageCount -> page_textView.text = getString(R.string.preview_page, page) })
                 .onError({ Toast.makeText(PrintActivity@this, "load failure", Toast.LENGTH_SHORT).show() })
                 .load();
 
