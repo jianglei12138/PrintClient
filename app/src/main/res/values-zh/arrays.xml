@@ -5,4 +5,36 @@
         <item>取消任务</item>
         <item>移动任务</item>
     </string-array>
+
+    <string-array name="sheets">
+        <item>1页</item>
+        <item>2页</item>
+        <item>4页</item>
+        <item>6页</item>
+        <item>9页</item>
+        <item>16页</item>
+    </string-array>
+
+    <string-array name="colors">
+        <item>黑白</item>
+        <item>色彩</item>
+    </string-array>
+
+    <string-array name="orientation">
+        <item>横向</item>
+        <item>纵向</item>
+        <item>横向翻转</item>
+        <item>纵向翻转</item>
+    </string-array>
+
+    <string-array name="oddoreven">
+        <item>全部页面</item>
+        <item>奇数页</item>
+        <item>偶数页</item>
+    </string-array>
+
+    <string-array name="duplex">
+        <item>单面</item>
+        <item>双面</item>
+    </string-array>
 </resources>

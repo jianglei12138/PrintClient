@@ -98,6 +98,6 @@
     <string name="cancel_failure">取消任务失败</string>
     <string name="cancel_success">任务取消成功</string>
     <string name="action_print">打印</string>
-    <string name="preview_page">第%d页</string>
+    <string name="preview_page">第%1$d页,共%2$d页</string>
 
 </resources>

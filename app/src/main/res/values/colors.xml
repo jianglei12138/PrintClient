@@ -16,4 +16,7 @@
     <color name="colorTabTitle">#BFBFBF</color>
     <color name="colorItemDecoration">#FEFEFE</color>
     <color name="colorPreview">#883396d4</color>
+    <color name="colorPrintHint">#E5E5E5</color>
+    <color name="colorPrintText">#EFEFEF</color>
+    <color name="colorPrintAccent">#EFEFEF</color>
 </resources>

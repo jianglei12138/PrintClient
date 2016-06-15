@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <jni.h>
 #include <cups/cups.h>
+#include <cups/ppd.h>
+#include <android/log.h>
+#include "cups_util.h"
 
 #define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,"JNIEnv",__VA_ARGS__)
 
@@ -248,4 +251,63 @@ JNIEXPORT jboolean JNICALL Java_com_android_printclient_fragment_fragment_SubMai
 JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getPrinters(
         JNIEnv *env, jobject jthis) {
     return Java_com_android_printclient_fragment_fragment_SubMainFragment_getPrinters(env,jthis);
+}
+
+char *getServerPpd(const char *name) {
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    http_t *http_t = gethttp_t();
+    char *ppdfile = (char *) cupsGetPPD2(http_t, name);
+    return ppdfile;
+}
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportPageSize(
+        JNIEnv *env, jobject jthis, jstring name) {
+
+    //init object of paper
+    jclass paper = (*env)->FindClass(env, "com/android/printclient/objects/Paper");
+    jmethodID paper_init = (*env)->GetMethodID(env, paper, "<init>", "()V");
+    jfieldID obj_name = (*env)->GetFieldID(env, paper, "name", "Ljava/lang/String;");
+    jfieldID obj_width = (*env)->GetFieldID(env, paper, "width", "F");
+    jfieldID obj_length = (*env)->GetFieldID(env, paper, "length", "F");
+    jfieldID obj_left = (*env)->GetFieldID(env, paper, "left", "F");
+    jfieldID obj_bottom = (*env)->GetFieldID(env, paper, "bottom", "F");
+    jfieldID obj_right = (*env)->GetFieldID(env, paper, "right", "F");
+    jfieldID obj_top = (*env)->GetFieldID(env, paper, "top", "F");
+
+    //init return list of papers
+    jclass papers = (*env)->FindClass(env, "java/util/ArrayList");
+    jmethodID papers_init = (*env)->GetMethodID(env, papers, "<init>", "()V");
+    jobject papers_instance = (*env)->NewObject(env, papers, papers_init, "");
+    jmethodID papers_add = (*env)->GetMethodID(env, papers, "add", "(Ljava/lang/Object;)Z");
+
+    ppd_file_t *ppd;
+    int num;
+    int i;
+    char *printer_name;
+    ppd_size_t *size;
+
+    printer_name = (*env)->GetStringUTFChars(env, name, 0);
+    LOGD("printer name %s",printer_name);
+
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    char *ppdfile = getServerPpd(printer_name);
+    ppd = ppdOpenFile(ppdfile);
+
+    num = ppd->num_sizes;
+    size = ppd->sizes;
+
+    for (i = 0; i < num; ++i, ++size) {
+        jobject *object = (*env)->NewObject(env, paper, paper_init, "");
+        jstring paper_name = (*env)->NewStringUTF(env, size->name);
+        (*env)->SetObjectField(env, object, obj_name, paper_name);
+        (*env)->SetFloatField(env, object, obj_top, size->top);
+        (*env)->SetFloatField(env, object, obj_bottom, size->bottom);
+        (*env)->SetFloatField(env, object, obj_left, size->left);
+        (*env)->SetFloatField(env, object, obj_right, size->right);
+        (*env)->SetFloatField(env, object, obj_length, size->length);
+        (*env)->SetFloatField(env, object, obj_width, size->width);
+
+        (*env)->CallBooleanMethod(env, papers_instance, papers_add, object);
+    }
+    return papers_instance;
 }
