@@ -247,10 +247,9 @@ JNIEXPORT jboolean JNICALL Java_com_android_printclient_fragment_fragment_SubMai
 }
 
 
-
 JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getPrinters(
         JNIEnv *env, jobject jthis) {
-    return Java_com_android_printclient_fragment_fragment_SubMainFragment_getPrinters(env,jthis);
+    return Java_com_android_printclient_fragment_fragment_SubMainFragment_getPrinters(env, jthis);
 }
 
 char *getServerPpd(const char *name) {
@@ -260,8 +259,28 @@ char *getServerPpd(const char *name) {
     return ppdfile;
 }
 
-JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportPageSize(
+static ppd_file_t *ppd;
+
+JNIEXPORT jboolean JNICALL Java_com_android_printclient_PrintActivity_init(
         JNIEnv *env, jobject jthis, jstring name) {
+
+    char *printer_name;
+    printer_name = (char *) (*env)->GetStringUTFChars(env, name, 0);
+    LOGD("printer name %s", printer_name);
+
+    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
+    char *ppdfile = getServerPpd(printer_name);
+
+    ppd =  ppdOpenFile(ppdfile);
+    if (ppd == NULL)
+        return 0;
+
+    ppdMarkDefaults(ppd);
+    return 1;
+}
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportPageSize(
+        JNIEnv *env, jobject jthis) {
 
     //init object of paper
     jclass paper = (*env)->FindClass(env, "com/android/printclient/objects/Paper");
@@ -273,6 +292,7 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportP
     jfieldID obj_bottom = (*env)->GetFieldID(env, paper, "bottom", "F");
     jfieldID obj_right = (*env)->GetFieldID(env, paper, "right", "F");
     jfieldID obj_top = (*env)->GetFieldID(env, paper, "top", "F");
+    jfieldID obj_marked = (*env)->GetFieldID(env, paper, "marked", "Z");
 
     //init return list of papers
     jclass papers = (*env)->FindClass(env, "java/util/ArrayList");
@@ -280,25 +300,17 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportP
     jobject papers_instance = (*env)->NewObject(env, papers, papers_init, "");
     jmethodID papers_add = (*env)->GetMethodID(env, papers, "add", "(Ljava/lang/Object;)Z");
 
-    ppd_file_t *ppd;
     int num;
     int i;
-    char *printer_name;
     ppd_size_t *size;
-
-    printer_name = (*env)->GetStringUTFChars(env, name, 0);
-    LOGD("printer name %s",printer_name);
-
-    setenv("TMPDIR", "/data/data/com.android.printclient/files", 1);
-    char *ppdfile = getServerPpd(printer_name);
-    ppd = ppdOpenFile(ppdfile);
 
     num = ppd->num_sizes;
     size = ppd->sizes;
 
-    for (i = 0; i < num; ++i, ++size) {
+    for (i = 0; i < num; ++i, size++) {
         jobject *object = (*env)->NewObject(env, paper, paper_init, "");
         jstring paper_name = (*env)->NewStringUTF(env, size->name);
+        (*env)->SetBooleanField(env, object, obj_marked, (jboolean) size->marked);
         (*env)->SetObjectField(env, object, obj_name, paper_name);
         (*env)->SetFloatField(env, object, obj_top, size->top);
         (*env)->SetFloatField(env, object, obj_bottom, size->bottom);
@@ -310,4 +322,43 @@ JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportP
         (*env)->CallBooleanMethod(env, papers_instance, papers_add, object);
     }
     return papers_instance;
+}
+
+
+JNIEXPORT jobject JNICALL Java_com_android_printclient_PrintActivity_getSupportDuplex(
+        JNIEnv *env, jobject jthis) {
+
+    ppd_option_t *option = ppdFindOption(ppd, "Duplex");
+    if (option == NULL)
+        return NULL;
+
+    int num = option->num_choices;
+    int i;
+    ppd_choice_t *choice = option->choices;
+
+    //init object of paper
+    jclass item = (*env)->FindClass(env, "com/android/printclient/objects/Item");
+    jmethodID item_init = (*env)->GetMethodID(env, item, "<init>", "()V");
+    jfieldID obj_choice = (*env)->GetFieldID(env, item, "choice", "Ljava/lang/String;");
+    jfieldID obj_text = (*env)->GetFieldID(env, item, "text", "Ljava/lang/String;");
+    jfieldID obj_marked = (*env)->GetFieldID(env, item, "marked", "Z");
+
+    //init return list of papers
+    jclass items = (*env)->FindClass(env, "java/util/ArrayList");
+    jmethodID items_init = (*env)->GetMethodID(env, items, "<init>", "()V");
+    jobject items_instance = (*env)->NewObject(env, items, items_init, "");
+    jmethodID items_add = (*env)->GetMethodID(env, items, "add", "(Ljava/lang/Object;)Z");
+
+    for (i = 0; i < num; ++i, choice++) {
+        jobject *object = (*env)->NewObject(env, item, item_init, "");
+        jstring item_choice = (*env)->NewStringUTF(env, choice->choice);
+        jstring item_text = (*env)->NewStringUTF(env, choice->text);
+
+        (*env)->SetBooleanField(env, object, obj_marked, (jboolean) choice->marked);
+        (*env)->SetObjectField(env, object, obj_text, item_text);
+        (*env)->SetObjectField(env, object, obj_choice, item_choice);
+
+        (*env)->CallBooleanMethod(env, items_instance, items_add, object);
+    }
+    return items_instance;
 }

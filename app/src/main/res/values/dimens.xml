@@ -7,4 +7,6 @@
     <dimen name="detail_padding">8dp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="swipe_layout">48dp</dimen>
+    <dimen name="more_margin">8dp</dimen>
 </resources>

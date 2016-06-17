@@ -5,6 +5,7 @@ package com.android.printclient.objects
  */
 
 class Paper {
+    var marked: Boolean = false
     var name: String? = null
     var width: Float = 0f
     var length: Float = 0f

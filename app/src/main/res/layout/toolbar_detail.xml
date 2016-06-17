@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipe_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     android:orientation="vertical">
 
@@ -24,26 +24,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dip"
-                android:labelFor="@+id/copies_edittext"
                 android:text="份数"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/colorPrintHint" />
 
-            <EditText
+
+            <android.support.v7.widget.AppCompatEditText
                 android:id="@+id/copies"
                 style="@style/EditTextStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
                 android:ellipsize="end"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
                 android:text="1"
-                android:textColor="@color/colorPrintText"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp" />
-
+                android:textColor="@color/colorPrintText" />
         </LinearLayout>
 
         <LinearLayout
@@ -68,15 +67,14 @@
                 style="@style/EditTextStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:inputType="numberDecimal"
-                android:singleLine="true"
-                android:textColor="@color/colorPrintText"
-                tools:text="全部"
                 android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp" />
+                android:layout_marginStart="8dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="全部"
+                android:textColor="@color/colorPrintText" />
 
         </LinearLayout>
     </LinearLayout>
@@ -134,7 +132,7 @@
                 android:id="@+id/oddoreven"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="8dp" />
 
         </LinearLayout>
     </LinearLayout>
@@ -226,15 +224,15 @@
                 style="@style/EditTextStyle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
                 android:ellipsize="end"
                 android:inputType="numberDecimal"
                 android:singleLine="true"
                 android:text="100%"
-                android:textColor="@color/colorPrintText"
-                android:layout_marginRight="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp" />
+                android:textColor="@color/colorPrintText" />
         </LinearLayout>
 
 
@@ -314,23 +312,7 @@
                 android:textColor="@color/colorPrintHint" />
 
             <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/direction"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <android.support.v7.widget.AppCompatSpinner
-                android:id="@+id/useless"
+                android:id="@+id/order"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
@@ -343,15 +325,45 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center_horizontal">
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_expand_more_black_24dp" />
-    </LinearLayout>
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dip"
+                android:labelFor="@+id/copies_edittext"
+                android:text="页面顺序"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/colorPrintHint" />
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/sheets_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>
 

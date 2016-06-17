@@ -6,4 +6,5 @@ package com.android.printclient.objects
 class Item {
     var choice: String? = null
     var text: String? = null
+    var marked: Boolean = false
 }

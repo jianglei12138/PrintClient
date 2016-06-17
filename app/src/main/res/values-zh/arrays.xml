@@ -35,6 +35,21 @@
 
     <string-array name="duplex">
         <item>单面</item>
-        <item>双面</item>
+    </string-array>
+
+    <string-array name="order">
+        <item>正常</item>
+        <item>逆序</item>
+    </string-array>
+
+    <string-array name="layout">
+        <item>btlr</item>
+        <item>btrl</item>
+        <item>lrbt</item>
+        <item>lrtb</item>
+        <item>rlbt</item>
+        <item>rltb</item>
+        <item>tblr</item>
+        <item>tbrl</item>
     </string-array>
 </resources>

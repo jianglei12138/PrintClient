@@ -99,5 +99,10 @@
     <string name="cancel_success">任务取消成功</string>
     <string name="action_print">打印</string>
     <string name="preview_page">第%1$d页,共%2$d页</string>
+    <string name="no_able_printer">无可用打印机</string>
+    <string name="copies_only_integer">份数只能是整数</string>
+    <string name="copies_number_many">份数应在1~100之间</string>
+    <string name="pages_format_error">范围格式不正确</string>
+    <string name="pages_number_error">页面范围不正确</string>
 
 </resources>
