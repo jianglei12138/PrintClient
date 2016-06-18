@@ -20,6 +20,10 @@
         <item>色彩</item>
     </string-array>
 
+    <string-array name="gray">
+        <item>黑白</item>
+    </string-array>
+
     <string-array name="orientation">
         <item>横向</item>
         <item>纵向</item>
@@ -42,14 +46,31 @@
         <item>逆序</item>
     </string-array>
 
+    <string-array name="layout_invalid">
+        <item>不可用</item>
+    </string-array>
+
+    <string-array name="layout_two">
+        <item>从左至右</item>
+        <item>从右至左</item>
+    </string-array>
+
     <string-array name="layout">
-        <item>btlr</item>
-        <item>btrl</item>
-        <item>lrbt</item>
-        <item>lrtb</item>
-        <item>rlbt</item>
-        <item>rltb</item>
-        <item>tblr</item>
-        <item>tbrl</item>
+        <item>从左至右,从上至下</item>
+        <item>从左至右,从下至上</item>
+        <item>从右至左,从上至下</item>
+        <item>从右至左,从下至上</item>
+        <item>从上至下,从左至右</item>
+        <item>从上至下,从右至左</item>
+        <item>从下至上,从左至右</item>
+        <item>从下至上,从右至左</item>
+    </string-array>
+
+    <string-array name="borders">
+        <item>无</item>
+        <item>单特细线</item>
+        <item>单细线</item>
+        <item>双特细线</item>
+        <item>双细线</item>
     </string-array>
 </resources>

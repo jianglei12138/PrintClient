@@ -13,12 +13,14 @@ import android.view.MenuItem
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import com.android.printclient.objects.Item
 import com.android.printclient.objects.Paper
 import com.android.printclient.objects.Printer
+import com.android.printclient.view.adapter.ItemSelectedAdapter
 import com.android.printclient.view.adapter.TextWatcherAdapter
 import kotlinx.android.synthetic.main.activity_spooler.*
 import kotlinx.android.synthetic.main.toolbar_detail.*
@@ -37,11 +39,11 @@ class PrintActivity : AppCompatActivity() {
     external fun init(name: String): Boolean
     external fun getSupportPageSize(): List<Paper>
     external fun getSupportDuplex(): List<Item>
-    external fun isSupportColor(): Boolean
 
     var animationShow: TranslateAnimation? = null
     var printers: List<Printer> = ArrayList()
     @Volatile var canExecute = Stack<Boolean>()
+    var pagecount = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +54,6 @@ class PrintActivity : AppCompatActivity() {
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         title = ""
 
-        var pagecount = 0
         pdfView.fromFile(File(intent.data.path))
                 .defaultPage(1)
                 .showMinimap(false)
@@ -119,45 +120,16 @@ class PrintActivity : AppCompatActivity() {
 
             setBackgroundAndAdapter(oddoreven, resources.getStringArray(R.array.oddoreven))
             setBackgroundAndAdapter(orientation, resources.getStringArray(R.array.orientation))
-            setBackgroundAndAdapter(colors, resources.getStringArray(R.array.colors))
             setBackgroundAndAdapter(sheets, resources.getStringArray(R.array.sheets))
             setBackgroundAndAdapter(order, resources.getStringArray(R.array.order))
-            setBackgroundAndAdapter(sheets_layout, resources.getStringArray(R.array.layout))
+            setBackgroundAndAdapter(borders, resources.getStringArray(R.array.borders))
 
-            copies.addTextChangedListener(object : TextWatcherAdapter() {
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (!TextUtils.isDigitsOnly(s) || TextUtils.isEmpty(s)) {
-                        val error = Html.fromHtml("<font color='#FFFFFF'>" + getString(R.string.copies_only_integer) + "</font>")
-                        copies.error = error
-                    } else if (s.toString().length > 3 || s.toString().toLong() > 100 || s.toString().toLong() < 1) {
-                        val error = Html.fromHtml("<font color='#FFFFFF'>" + getString(R.string.copies_number_many) + "</font>")
-                        copies.error = error
-                    }
-                }
+            //init sheets
+            setBackgroundAndAdapter(sheets_layout, resources.getStringArray(R.array.layout_invalid))
+            sheets_layout.isEnabled = false
 
-            })
-
-            pages.addTextChangedListener(object : TextWatcherAdapter() {
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (!rangeFilter(s.toString())) {
-                        val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_format_error) + " </font>")
-                        pages.error = error
-                    } else {
-                        s!!.split(",").toList().forEach {
-                            if (it.contains("-")) {
-                                var page = it.split("-")
-                                if (page[0].toInt() >= page[1].toInt() || page[1].toInt() > pagecount) {
-                                    val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_format_error) + "</font>")
-                                    pages.error = error
-                                }
-                            } else if (it.toInt() > pagecount) {
-                                val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_number_error) + " </font>")
-                                pages.error = error
-                            }
-                        }
-                    }
-                }
-            })
+            addEditTextListener()
+            addSpinnerListener()
 
             var lessBg = resources.getDrawable(R.drawable.ic_expand_less_black_24dp)
             var moreBg = resources.getDrawable(R.drawable.ic_expand_more_black_24dp)
@@ -177,6 +149,68 @@ class PrintActivity : AppCompatActivity() {
                 }
             })
         }
+    }
+
+    private fun addSpinnerListener() {
+        //for spinner
+        sheets.onItemSelectedListener = object : ItemSelectedAdapter() {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                when (position) {
+                    0 -> {
+                        setAdapter(sheets_layout, resources.getStringArray(R.array.layout_invalid))
+                        sheets_layout.isEnabled = false
+                    }
+                    1 -> {
+                        setAdapter(sheets_layout, resources.getStringArray(R.array.layout_two))
+                        sheets_layout.isEnabled = true
+                    }
+                    else -> {
+                        setAdapter(sheets_layout, resources.getStringArray(R.array.layout))
+                        sheets_layout.isEnabled = true
+                    }
+                }
+            }
+        }
+    }
+
+    private fun addEditTextListener() {
+        //for edittext
+
+        copies.addTextChangedListener(object : TextWatcherAdapter() {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!TextUtils.isDigitsOnly(s) || TextUtils.isEmpty(s)) {
+                    val error = Html.fromHtml("<font color='#FFFFFF'>" + getString(R.string.copies_only_integer) + "</font>")
+                    copies.error = error
+                } else if (s.toString().length > 3 || s.toString().toLong() > 100 || s.toString().toLong() < 1) {
+                    val error = Html.fromHtml("<font color='#FFFFFF'>" + getString(R.string.copies_number_many) + "</font>")
+                    copies.error = error
+                }
+            }
+
+        })
+
+        pages.addTextChangedListener(object : TextWatcherAdapter() {
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!rangeFilter(s.toString())) {
+                    val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_format_error) + " </font>")
+                    pages.error = error
+                } else {
+                    s!!.split(",").toList().forEach {
+                        if (it.contains("-")) {
+                            var page = it.split("-")
+                            if (page[0].toInt() >= page[1].toInt() || page[1].toInt() > pagecount) {
+                                val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_format_error) + "</font>")
+                                pages.error = error
+                            }
+                        } else if (it.toInt() > pagecount) {
+                            val error = Html.fromHtml("<font color='#FFFFFF'> " + getString(R.string.pages_number_error) + " </font>")
+                            pages.error = error
+                        }
+                    }
+                }
+            }
+        })
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
